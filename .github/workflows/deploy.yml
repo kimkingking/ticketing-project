@@ -27,4 +27,4 @@ jobs:
         # 깃허브 Secrets에 저장한 KUBE_CONFIG를 사용해 배포합니다.
         mkdir -p ~/.kube
         echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
-        kubectl rollout restart deployment ticketing-was-deployment
+        kubectl rollout restart deployment ticketing-was-deploy
