@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ticketing-was-deploy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ticketing-was
+  template:
+    metadata:
+      labels:
+        app: ticketing-was
+    spec:
+      containers:
+      - name: ticketing-was
+        image: kingking4105/ticketing-was:v7
+        ports:
+        - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ticketing-was-service
+spec:
+  type: ClusterIP
+  selector:
+    app: ticketing-was
+  ports:
+  - port: 80
+    targetPort: 8000
