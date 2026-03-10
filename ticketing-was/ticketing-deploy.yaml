@@ -19,7 +19,7 @@ spec:
         - containerPort: 8000
         volumeMounts:
         - name: was-storage
-          mountPath: /app
+          mountPath: /app/data
       volumes:
       - name: was-storage  # 수정된 부분
         persistentVolumeClaim:
