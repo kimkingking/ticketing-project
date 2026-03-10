@@ -1,0 +1,22 @@
+# vi values.yaml (또는 쓰고 계신 설정 파일)
+controller:
+  service:
+    type: NodePort
+    nodePorts:
+      http: 30007 # ★ 여기서 30007을 관리하도록 설정
+  config:
+    enable-modsecurity: "true"
+    enable-owasp-modsecurity-crs: "true"
+
+  # 2. 리소스 제한 (티켓팅 서비스 부하 대비)
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+  # 3. 서비스 타입 설정 (설계도의 MetalLB 연동)
+  service:
+    type: LoadBalancer

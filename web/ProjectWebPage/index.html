@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K-PULSE | Dark Futurism Concert Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="./css/mainpage.css">
+</head>
+<body class="selection:bg-cyan-500 selection:text-slate-950">
+
+    <div class="glow-1"></div>
+    <div class="glow-2"></div>
+
+    <div id="loader" class="fixed inset-0 z-[200] bg-slate-950 flex flex-col items-center justify-center transition-opacity duration-700">
+        <div class="w-16 h-16 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin shadow-[0_0_20px_rgba(6,182,212,0.5)] mb-4"></div>
+        <h1 class="text-cyan-400 font-black text-xl tracking-[0.3em] animate-pulse">K-PULSE</h1>
+    </div>
+
+    <nav class="fixed top-0 left-0 w-full bg-slate-950/90 backdrop-blur-2xl border-b border-white/5 z-50 px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-2 font-black text-2xl tracking-tighter text-white">
+            K-PULSE <span class="w-2 h-2 bg-cyan-500 rounded-full animate-pulse"></span>
+        </div>
+        <div class="flex gap-4 items-center">
+            <input type="date" id="startDate" class="filter-input">
+            <input type="date" id="endDate" class="filter-input">
+            <select id="genreSelect" class="filter-input" onchange="refreshData()">
+                <option value="">전체 장르</option>
+                <option value="AAAA">연극</option>
+                <option value="AAAB">뮤지컬</option>
+                <option value="CCCA">국악</option>
+                <option value="BBBA">무용</option>
+                <option value="CCBA">클래식</option>
+            </select>
+            <button onclick="refreshData()" class="search-btn">조회</button>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto pt-28 pb-32 px-6">
+        <section class="mb-16">
+            <h2 class="section-title"><span class="text-cyan-500">01</span> BOX OFFICE TOP 10</h2>
+            <div id="boxOfficeList" class="flex gap-6 overflow-x-auto no-scrollbar pb-4 min-h-[350px]">
+                </div>
+        </section>
+
+        <section>
+            <h2 class="section-title"><div class="w-8 h-[2px] bg-cyan-500 mr-2"></div> 02 LIVE SCHEDULE</h2>
+            <div id="performanceList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                </div>
+        </section>
+    </main>
+
+    <div id="modal-container" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-950/90 backdrop-blur-md" onclick="closeModal()"></div>
+        <div id="modal-content" class="modal-box animate-fade-in">
+            </div>
+    </div>
+
+    <script src="./js/mainpage.js"></script>
+</body>
+</html>

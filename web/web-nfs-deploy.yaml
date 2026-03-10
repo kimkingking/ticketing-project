@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nfs-web-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nfs-web
+  template:
+    metadata:
+      labels:
+        app: nfs-web
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: nfs-vol
+          mountPath: /usr/share/nginx/html # Nginx가 인식하는 웹 경로
+          readOnly: false
+      volumes:
+      - name: nfs-vol
+        persistentVolumeClaim:
+          claimName: nfs-pvc # 위에서 만든 PVC 이름
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-service
+spec:
+  type: NodePort # 외부 접속을 위해 NodePort 사용
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30007
+  selector:
+    app: ticketing-web

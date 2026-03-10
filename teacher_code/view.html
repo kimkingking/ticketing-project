@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="css/style.css">
+    <title>상세보기</title>
+</head>
+<body>
+    <div class="container">
+        <nav class="nav-menu" id="nav-menu"></nav>
+        <div class="view-box">
+            <div class="view-header">
+                <h2 id="v_title">로딩 중...</h2>
+                <div class="view-meta">작성자: <span id="v_name"></span> | <span id="v_date"></span></div>
+            </div>
+            <div id="v_content" class="text-area" style="white-space:pre-wrap;"></div>
+        </div>
+        <div id="view-buttons" class="btn-group">
+            </div>
+    </div>
+    <script src="js/app.js"></script>
+    <script>window.onload = () => { updateMenu(); loadView(); };</script>
+</body>
+</html>

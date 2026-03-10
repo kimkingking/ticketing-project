@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: was-nfs-pv
+spec:
+  accessModes:
+  - ReadWriteMany
+  capacity:
+    storage: 2Gi
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: was-nfs
+  nfs:
+    server: 10.16.0.151
+    path: /root/ProjectWebPage/ProjectWebPage/dynamic
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: was-nfs-pvc
+spec:
+  storageClassName: was-nfs
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi

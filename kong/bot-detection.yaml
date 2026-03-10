@@ -1,0 +1,16 @@
+#vi bot-detection.yaml
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: ticketing-bot-detection
+config: 
+  allow:
+    - "googlebot"
+    - "bingbot"
+  deny:
+    - "python-requests"
+    - "curl"
+    - "Go-http-client"
+    - "axios"
+    - "node-fetch"
+plugin: bot-detection

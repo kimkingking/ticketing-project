@@ -1,0 +1,12 @@
+# 1. 비서 프로그램 (이건 서버에만 있으면 돼요)
+actions-runner/
+
+# 2. 거대한 압축 파일들
+*.tar
+*.tar.gz
+*.zip
+
+# 3. 시스템 및 임시 파일
+snap/
+__pycache__/
+.env

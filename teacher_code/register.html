@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="css/style.css">
+    <title>회원가입</title>
+</head>
+<body>
+    <div class="container">
+        <nav class="nav-menu" id="nav-menu"></nav>
+        <h2>회원가입</h2>
+        <div class="input-form">
+            <input type="text" id="reg_id" placeholder="아이디">
+            <input type="password" id="reg_pass" placeholder="비밀번호">
+            <input type="text" id="reg_name" placeholder="이름">
+			<input type="text" id="reg_nick" placeholder="닉네임">
+			<input type="number" id="reg_age" placeholder="나이">
+			<input type="email" id="reg_email" placeholder="이메일">
+            <div class="btn-group">
+                <button onclick="register()">가입하기</button>
+                <button onclick="history.back()" class="btn-cancel">취소</button>
+            </div>
+        </div>
+    </div>
+    <script src="js/app.js"></script>
+    <script>window.onload = updateMenu;</script>
+</body>
+</html>

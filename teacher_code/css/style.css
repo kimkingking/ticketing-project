@@ -1,0 +1,31 @@
+/* css/style.css */
+body { font-family: 'Malgun Gothic', sans-serif; background: #f4f7f6; padding: 20px; color: #333; }
+.container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+/* 메뉴 바 스타일 */
+.nav-menu { background: #2c3e50; padding: 15px; border-radius: 8px; margin-bottom: 25px; color: white; display: flex; justify-content: space-between; align-items: center; }
+.nav-menu a { color: #ecf0f1; text-decoration: none; margin-right: 15px; font-weight: bold; }
+.nav-menu a:hover { color: #3498db; }
+.user-info { font-size: 0.9em; background: #34495e; padding: 5px 10px; border-radius: 4px; }
+
+/* 테이블 및 폼 스타일 */
+table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+th, td { border-bottom: 1px solid #ddd; padding: 15px; text-align: left; }
+th { background: #f8f9fa; color: #555; }
+tr:hover { background: #f1f1f1; }
+
+.input-form { display: flex; flex-direction: column; gap: 10px; }
+.input-form input, .input-form textarea { padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 1em; }
+textarea { resize: vertical; min-height: 200px; }
+
+/* 버튼 스타일 */
+.btn-group { margin-top: 20px; display: flex; gap: 10px; }
+button { padding: 10px 20px; cursor: pointer; border: none; border-radius: 6px; background: #3498db; color: white; font-weight: bold; }
+button:hover { background: #2980b9; }
+.btn-write { background: #27ae60; float: right; }
+.btn-cancel { background: #95a5a6; }
+
+/* 상세보기 박스 */
+.view-box { border: 1px solid #eee; padding: 20px; border-radius: 8px; }
+.view-header { border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-bottom: 20px; }
+.view-meta { font-size: 0.85em; color: #7f8c8d; margin-top: 5px; }

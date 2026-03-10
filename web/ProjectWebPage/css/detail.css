@@ -1,0 +1,171 @@
+body {
+    font-family: 'Malgun Gothic', sans-serif;
+    background-color: #f4f4f9;
+    padding: 20px;
+}
+
+.detail-container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.loading {
+    text-align: center;
+    font-size: 18px;
+    color: #666;
+    padding: 50px 0;
+}
+
+/* 상단 정보 영역 (포스터 + 텍스트) */
+.info-section {
+    display: flex;
+    gap: 30px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 30px;
+    margin-bottom: 30px;
+}
+
+.poster-img {
+    width: 300px;
+    height: 420px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.text-info h1 {
+    margin-top: 0;
+    color: #333;
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+.info-row {
+    margin-bottom: 10px;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.info-label {
+    font-weight: bold;
+    color: #555;
+    display: inline-block;
+    width: 90px;
+}
+
+.price {
+    color: #e74c3c;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+/* 예매처 링크 버튼 */
+.booking-links {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.booking-btn {
+    padding: 8px 16px;
+    background-color: #27ae60;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.booking-btn:hover {
+    background-color: #219653;
+}
+
+/* 하단 소개 이미지 영역 */
+.intro-images h2 {
+    border-left: 4px solid #0056b3;
+    padding-left: 10px;
+    margin-bottom: 20px;
+}
+
+.intro-images img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto 15px auto;
+    border-radius: 4px;
+}
+
+/* 🎟️ 사전 예매하기 버튼 스타일 */
+.prebook-btn {
+    display: inline-block;
+    margin-top: 12px;
+    margin-left: 5px;
+    padding: 8px 16px;
+    background-color: #6c5ce7; /* 눈에 띄는 보라색 */
+    color: #ffffff;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.prebook-btn:hover {
+    background-color: #5b4bc4;
+}
+
+/* 팝업(모달) 공통 스타일 */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(30, 30, 50, 0.95); /* 어두운 남색 배경 */
+    display: flex; justify-content: center; align-items: center;
+    z-index: 1000;
+}
+.modal-content {
+    background: white; padding: 40px; border-radius: 12px;
+    text-align: center; max-width: 450px; width: 90%;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+}
+
+/* 대기열 진행바 */
+.waiting-box {
+    background: #f4f4f9; padding: 30px 20px; border-radius: 8px; margin-top: 20px;
+}
+.progress-bar-container {
+    width: 100%; height: 14px; background-color: #e0e0e0;
+    border-radius: 7px; margin-top: 25px; overflow: hidden;
+    border: 1px solid #4834d4;
+}
+.progress-bar {
+    height: 100%; width: 0%; background-color: #4834d4;
+    transition: width 0.5s linear;
+}
+
+/* 보안 문자 */
+.captcha-box { margin-top: 20px; }
+.captcha-display {
+    background-color: #4834d4; color: white;
+    font-size: 28px; font-weight: bold; letter-spacing: 8px;
+    padding: 20px; border-radius: 8px; margin-bottom: 15px;
+    display: flex; justify-content: space-between; align-items: center;
+}
+.refresh-btn {
+    background: none; border: none; color: white; font-size: 20px; cursor: pointer;
+}
+.captcha-input-group { display: flex; gap: 0; }
+.captcha-input-group input {
+    flex: 1; padding: 12px; border: 2px solid #4834d4; border-right: none;
+    border-radius: 6px 0 0 6px; font-size: 14px; outline: none;
+}
+.submit-btn {
+    background-color: #4834d4; color: white; padding: 0 25px;
+    border: none; border-radius: 0 6px 6px 0; font-weight: bold; cursor: pointer;
+}
+.close-btn {
+    margin-top: 30px; padding: 8px 20px; background-color: #95a5a6;
+    border: none; border-radius: 4px; color: white; cursor: pointer;
+}

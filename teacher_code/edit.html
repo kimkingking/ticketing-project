@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="css/style.css">
+    <title>글 수정</title>
+</head>
+<body>
+    <div class="container">
+        <nav class="nav-menu" id="nav-menu"></nav>
+        <h2>게시글 수정</h2>
+        <div class="input-form">
+            <input type="hidden" id="edit_no">
+            <label>제목</label>
+            <input type="text" id="edit_title">
+            <label>비밀번호 확인</label>
+            <input type="password" id="edit_pass" placeholder="작성 시 비밀번호 입력">
+            <label>내용</label>
+            <textarea id="edit_content" rows="10"></textarea>
+            <div class="btn-group">
+                <button onclick="updatePost()">수정 완료</button>
+                <button onclick="history.back()" class="btn-cancel">취소</button>
+            </div>
+        </div>
+    </div>
+    <script src="js/app.js"></script>
+    <script>window.onload = () => { updateMenu(); loadEditData(); };</script>
+</body>
+</html>

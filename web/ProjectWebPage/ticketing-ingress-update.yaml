@@ -1,0 +1,43 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ticketing-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    # 기존에 있던 rewrite-target은 라우팅 오류를 낼 수 있어 제거했습니다.
+spec:
+  rules:
+  - http:
+      paths:
+      # 1. API 데이터 요청 (파이썬 WAS로 전송)
+      - path: /seats
+        pathType: Prefix
+        backend:
+          service:
+            name: ticketing-was-service
+            port:
+              number: 80
+      - path: /db-test
+        pathType: Prefix
+        backend:
+          service:
+            name: ticketing-was-service
+            port:
+              number: 80
+      - path: /enter
+        pathType: Prefix
+        backend:
+          service:
+            name: ticketing-was-service
+            port:
+              number: 80
+      
+      # 2. 기본 웹 화면 요청 (우리가 새로 만든 Nginx WEB으로 전송!)
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ticketing-web-svc
+            port:
+              number: 80

@@ -1,0 +1,29 @@
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: ticketing-security-all-in-one
+config:
+  access:
+    - |
+      -- [1순위] JMeter/테스트용 하이패스 확인
+      local bypass_key = kong.request.get_header("X-Testing-Key")
+      if bypass_key == "bohae-special-token" then
+          return 
+      end
+
+      -- [2순위] 봇 감지 (User-Agent 검사)
+      local ua = kong.request.get_header("user-agent") or ""
+      local bad_bots = {"python-requests", "curl", "Go-http-client", "axios"}
+      
+      for _, bot in ipairs(bad_bots) do
+        if string.find(string.lower(ua), string.lower(bot)) then
+          return kong.response.exit(403, { message = "Bot detected by name." })
+        end
+      end
+
+      -- [3순위] 브라우저 필수 헤더 검사
+      local lang = kong.request.get_header("accept-language")
+      if not lang then
+        return kong.response.exit(403, { message = "Missing browser headers." })
+      end
+plugin: pre-function

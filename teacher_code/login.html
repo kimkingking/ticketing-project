@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="css/style.css">
+    <title>로그인</title>
+</head>
+<body>
+    <div class="container">
+        <nav class="nav-menu" id="nav-menu"></nav>
+        <h2>로그인</h2>
+        <div class="input-form">
+            <input type="text" id="login_id" placeholder="아이디">
+            <input type="password" id="login_pass" placeholder="비밀번호">
+            <div class="btn-group">
+                <button onclick="login()">로그인</button>
+                <button onclick="location.href='index.html'" class="btn-cancel">홈으로</button>
+            </div>
+        </div>
+    </div>
+    <script src="js/app.js"></script>
+    <script>window.onload = updateMenu;</script>
+</body>
+</html>
