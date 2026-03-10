@@ -19,7 +19,7 @@ jobs:
 
     - name: Build and push Docker image
       run: |
-        docker build -t kingking4105/ticketing-was:latest .
+        docker build -t kingking4105/ticketing-was:latest ./ticketing-was
         docker push kingking4105/ticketing-was:latest
 
     - name: Deploy to K8s
