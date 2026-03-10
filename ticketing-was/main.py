@@ -9,7 +9,7 @@ app = FastAPI()
 
 # 1. DB 연결 설정 (한글 깨짐 방지 charset=utf8mb4 추가!)
 # 보혜님, DB_URL 끝에 파라미터를 붙여야 파이썬이 한글을 제대로 보냅니다.
-DB_URL = "mysql+pymysql://mysql:1234@mysql:3306/ticket?charset=utf8mb4"
+DB_URL = "mysql+pymysql://was_user:1234@mysql:3306/ticket?charset=utf8mb4"
 engine = create_engine(DB_URL)
 
 # 2. Redis 연결 설정
