@@ -29,10 +29,7 @@ jobs:
         echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
 
         # 2. 단순히 껐다 켜는 게 아니라, 수정된 '설계도(YAML)'를 직접 적용합니다!
-        # 경로가 ./ticketing-was/ 안에 있는지 꼭 확인하세요! ㅋ
-        kubectl apply -f ./db/
-        kubectl apply -f ./redis/
-        kubectl apply -f ./ticketing-was/
+        find . -name "*.yaml" -not -path "*/.*" -exec kubectl apply -f {} + || true
 
         # 3. (선택사항) 만약 이미지가 latest라면 확실히 재시작까지 해주면 더 좋아요.
         kubectl rollout restart deployment ticketing-was-deploiy
