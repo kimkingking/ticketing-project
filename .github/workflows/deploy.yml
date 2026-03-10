@@ -24,7 +24,13 @@ jobs:
 
     - name: Deploy to K8s
       run: |
-        # 깃허브 Secrets에 저장한 KUBE_CONFIG를 사용해 배포합니다.
+        # 1. 비서의 컴퓨터에 쿠버네티스 접속 설정 만들기 (이건 꼭 필요해요!)
         mkdir -p ~/.kube
         echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
+
+        # 2. 단순히 껐다 켜는 게 아니라, 수정된 '설계도(YAML)'를 직접 적용합니다!
+        # 경로가 ./ticketing-was/ 안에 있는지 꼭 확인하세요! ㅋ
+        kubectl apply -f ./ticketing-was/ticketing-deploy.yaml
+
+        # 3. (선택사항) 만약 이미지가 latest라면 확실히 재시작까지 해주면 더 좋아요.
         kubectl rollout restart deployment ticketing-was-deploy
