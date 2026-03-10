@@ -18,10 +18,10 @@ spec:
         ports:
         - containerPort: 8000
         volumeMounts:
-          - name: was-storage
+        - name: was-storage
           mountPath: /app
       volumes:
-        name: was-storage
+      - name: was-storage  # 수정된 부분
         persistentVolumeClaim:
           claimName: was-nfs-pvc
 ---
