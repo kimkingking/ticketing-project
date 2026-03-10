@@ -4,3 +4,5 @@ sqlalchemy
 pymysql
 cryptography
 redis
+pyjwt
+python-multipart
