@@ -30,7 +30,7 @@ kind: Service
 metadata:
   name: ticketing-was-service
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
     app: ticketing-was
   ports:
