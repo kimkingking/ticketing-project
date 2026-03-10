@@ -16,6 +16,7 @@ spec:
       - name: ticketing-was
         image: kingking4105/ticketing-was:latest
         imagePullPolicy: Always
+        workingDir: /app/data
         ports:
         - containerPort: 8000
         volumeMounts:

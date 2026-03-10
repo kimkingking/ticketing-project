@@ -1,0 +1,36 @@
+name: Docker Image CI/CD
+
+on:
+  push:
+    branches: [ "main" ] # 브랜치 이름이 main인 것 확인 완료! ㅋ
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 소스코드 체크아웃
+      uses: actions/checkout@v4
+
+    - name: 도커 허브 로그인
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: 빌드 및 푸시 🚀
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/ticketing-was:latest 
+
+    - name: 마스터 노드에 배포 명령 하달 🏰
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.MASTER_HOST }}
+        username: ${{ secrets.MASTER_USER }}
+        key: ${{ secrets.MASTER_KEY }}
+        script: |
+          # 아까 확인한 보혜님 Deployment 이름입니다! ㅋ
+          kubectl rollout restart deployment/ticketing-was-deploy
+          kubectl rollout status deployment/ticketing-was-deploy

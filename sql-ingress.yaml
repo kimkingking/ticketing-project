@@ -6,6 +6,11 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/enable-modsecurity: "true"
+    # 아래 줄을 꼭 추가하세요! (전 세계 표준 보안 규칙셋)
+    nginx.ingress.kubernetes.io/enable-owasp-core-rules: "true"
+    # 차단 시 로그를 남기려면 아래 설정도 유용합니다.
+    nginx.ingress.kubernetes.io/modsecurity-snippet: |
+      SecRuleEngine On
 spec:
   rules:
   - http:
