@@ -14,7 +14,8 @@ spec:
     spec:
       containers:
       - name: ticketing-was
-        image: kingking4105/ticketing-was:v7
+        image: kingking4105/ticketing-was:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8000
         volumeMounts:
