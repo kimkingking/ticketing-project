@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: mysql-pv
+  name: mysql-pv  #저장소이름
 spec:
   capacity:
     storage: 1Gi
   accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
+    - ReadWriteOnce #한 번에 하나의 노드(vm)에서만 읽고 쓸 수 있음
+  persistentVolumeReclaimPolicy: Retain # pod가 삭제되어도 데이터는 유지
   hostPath:
-    path: "/root/db/data"
+    path: "/root/db/data" #이 경로에 데이터가 쌓임
