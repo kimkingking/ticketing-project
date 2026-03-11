@@ -67,26 +67,26 @@ def get_seats():
 @app.post("/reserve")
 def reserve_ticket(req: ReservationRequest):
     try:
-        # 1. Redis 대기열은 유지 (순서대로 입장)
+        # 1. Redis 대기열은 유지
         now = time.time()
         rd.zadd("ticket_queue", {req.user_id: now})
         rank = rd.zrank("ticket_queue", req.user_id) + 1
 
         with engine.connect() as conn:
             with conn.begin():
-                # 2. 비관적 락: 1번 좌석을 꽉 잡습니다.
+                # 2. 비관적 락: 해당 좌석을 꽉 잡습니다.
                 select_query = text("SELECT status FROM seat WHERE seat_id = :id FOR UPDATE")
                 seat = conn.execute(select_query, {"id": req.seat_id}).fetchone()
 
-                # 3. 상태 체크: AVAILABLE 인지 확인
+                # 3. 상태 체크
                 if not seat or seat[0] != 'AVAILABLE':
                     return {
-                        "status": "fail", 
-                        "message": "이미 예약이 완료된 좌석입니다.", 
+                        "status": "fail",
+                        "message": "이미 예약이 완료된 좌석입니다.",
                         "waiting_number": rank
                     }
 
-                # 4. ⭐ 핵심 수정: PENDING이 아니라 바로 OCCUPIED(점유됨)로 변경!
+                # 4. 바로 OCCUPIED(점유됨)로 변경
                 update_query = text("UPDATE seat SET status = 'OCCUPIED' WHERE seat_id = :id")
                 conn.execute(update_query, {"id": req.seat_id})
 
@@ -101,16 +101,19 @@ def reserve_ticket(req: ReservationRequest):
                     "select_date": req.select_date, "select_time": req.select_time,
                     "place": req.place, "price": req.price
                 })
-        except Exception as e:  
-            db.rollback()
-            print(f"Error during reservation: {e}")
-            return {"status": "error", "message": "예약 중 오류가 발생했습니다."}
 
+        # 모든 과정이 성공하면 리턴
         return {
             "status": "success",
-            "message": f"{req.seat_id}번 좌석 예약이 완료되었습니다! 즐거운 관람 되세요.",
+            "message": f"{req.seat_id}번 좌석 예약이 완료되었습니다!",
             "waiting_number": rank
         }
+
+    except Exception as e:
+        # db.rollback()은 conn.begin()이 자동으로 해주므로 삭제했습니다!
+        print(f"Error during reservation: {e}")
+        return {"status": "error", "message": f"예약 중 오류 발생: {str(e)}"}
+
 # [기능 5] 특정 유저 정보 조회
 @app.get("/users/{user_id}")
 def get_user(user_id: str):
