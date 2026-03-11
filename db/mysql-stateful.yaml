@@ -31,18 +31,31 @@ spec:
         image: mysql:8.0
         env:
         - name: MYSQL_ROOT_PASSWORD
-          value: "1234"
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: MYSQL_ROOT_PASSWORD
         - name: MYSQL_DATABASE
           value: "ticket"
         - name: MYSQL_USER
           value: "was_user"
         - name: MYSQL_PASSWORD
-          value: "1234"
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: MYSQL_PASSWORD
         ports:
         - containerPort: 3306
         volumeMounts:
         - name: mysql-persistent-storage
           mountPath: /var/lib/mysql
+        - name: mysql-config-volume
+          mountPath: /etc/mysql/conf.d/my.cnf
+          subPath: my.cnf
+      volumes:
+      - name: mysql-config-volume
+        configMap:
+          name: mysql-config
   volumeClaimTemplates:  # 설계도의 k8s statefulSet PVC 부분 -> mysql-pv가 이 요청을 받아 실제 물리 공관과 연결
   - metadata:
       name: mysql-persistent-storage

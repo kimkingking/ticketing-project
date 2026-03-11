@@ -22,7 +22,7 @@ jobs:
       with:
         context: .
         push: true
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/ticketing-was:latest 
+        tags: ${{ secrets.DOCKER_USERNAME }}/ticketing-was:latest 
 
     - name: 마스터 노드에 배포 명령 하달 🏰
       uses: appleboy/ssh-action@v1.0.3

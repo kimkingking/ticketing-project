@@ -1,16 +1,48 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ticketing-ingress
+  name: ticketing-combined-ingress
   namespace: ticketing-system
   annotations:
     kubernetes.io/ingress.class: nginx
+
+    # ========================================================
+    # 1. SQL 인젝션 & XSS 방어 (WAF - ModSecurity)
+    # ========================================================
     nginx.ingress.kubernetes.io/enable-modsecurity: "true"
-    # 아래 줄을 꼭 추가하세요! (전 세계 표준 보안 규칙셋)
     nginx.ingress.kubernetes.io/enable-owasp-core-rules: "true"
-    # 차단 시 로그를 남기려면 아래 설정도 유용합니다.
     nginx.ingress.kubernetes.io/modsecurity-snippet: |
       SecRuleEngine On
+      SecAuditLog /dev/stdout
+      SecAuditLogType Serial
+
+    # ========================================================
+    # 2. DDoS 및 과도한 요청 방어 (Rate Limit)
+    # ========================================================
+    # 초당 요청 수 (RPS) - 팀 프로젝트 테스트를 위해 20으로 상향 조정했습니다.
+    nginx.ingress.kubernetes.io/limit-rps: "20"
+    # 동일 IP에서 동시 연결 가능한 수
+    nginx.ingress.kubernetes.io/limit-connections: "10"
+    # 일시적인 트래픽 폭주 허용치
+    nginx.ingress.kubernetes.io/limit-burst-multiplier: "3"
+
+    # ========================================================
+    # 3. 브라우저 보안 헤더 (Browser Security)
+    # ========================================================
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      # 클릭재킹 방지: 우리 사이트를 타 사이트 프레임에 넣지 못하게 함
+      add_header X-Frame-Options "SAMEORIGIN" always;
+      
+      # MIME 스니핑 방지: 파일 형식 변조 공격 차단
+      add_header X-Content-Type-Options "nosniff" always;
+      
+      # CSP: 허용된 자원만 실행 (XSS 2차 방어선)
+      # 외부 API나 폰트를 쓴다면 'self' 뒤에 해당 도메인을 추가하세요.
+      add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';" always;
+      
+      # Referrer 보안: 민감한 주소 정보 유출 방지
+      add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
 spec:
   rules:
   - http:

@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: db-allow-only-was
+  namespace: default
+spec:
+  # [보호 대상] 이름표가 'app=mysql'인 포드(DB)를 지킵니다.
+  podSelector:
+    matchLabels:
+      app: mysql
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    # [허용 대상] 오직 이름표가 'app=ticketing-was'인 포드(WAS)만 접속 허용!
+    - podSelector:
+        matchLabels:
+          app: ticketing-was

@@ -9,4 +9,4 @@ spec:
     - ReadWriteOnce #한 번에 하나의 노드(vm)에서만 읽고 쓸 수 있음
   persistentVolumeReclaimPolicy: Retain # pod가 삭제되어도 데이터는 유지
   hostPath:
-    path: "/root/db/data" #이 경로에 데이터가 쌓임
+    path: "/root/db/data" #이 경로(워커 노드) 에 데이터가 쌓임
