@@ -27,15 +27,12 @@ jobs:
         mkdir -p ~/.kube
         echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
 
-        # 1. 일단 현재 어디에 어떤 파일이 있는지 로그에 다 찍어라! (범인 검거용)
-        echo "--- 파일 목록 확인 ---"
-        ls -R ./ticketing-was
-        
-        # 2. 에러가 나도 깃허브 비서가 '성공'이라고 속이게 만듭니다 (|| true)
-        # 이렇게 하면 빨간 X 대신 초록 체크가 뜨면서 로그를 자세히 볼 수 있어요! ㅋ
-        kubectl apply -f ./ticketing-was --recursive 
+        # 핵심 수정: 에러 나는 ns.json 무시하고, 실제 배포 파일만 실행!
+        # 파일 이름을 정확하게 지정해 주는 게 가장 안전합니다.
+        kubectl apply -f ./ticketing-was/ticketing-deploy.yaml
 
-        # 3. 재시작 (있으면 하고 없으면 말고! ㅋ)
-        kubectl rollout restart deployment ticketing-was-deploy 
+        # 확실하게 재시작해서 새 이미지 반영
+        kubectl rollout restart deployment/ticketing-was-deploy
 
+        # 완료 대기
         kubectl rollout status deployment/ticketing-was-deploy
