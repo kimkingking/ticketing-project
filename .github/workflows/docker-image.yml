@@ -20,7 +20,7 @@ jobs:
     - name: 빌드 및 푸시 🚀
       uses: docker/build-push-action@v5
       with:
-        context: .
+        context: ./ticketing-was
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/ticketing-was:latest 
 
