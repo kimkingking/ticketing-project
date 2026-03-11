@@ -29,11 +29,13 @@ jobs:
 
         # 1. 일단 현재 어디에 어떤 파일이 있는지 로그에 다 찍어라! (범인 검거용)
         echo "--- 파일 목록 확인 ---"
-        ls -R
+        ls -R ./ticketing-was
         
         # 2. 에러가 나도 깃허브 비서가 '성공'이라고 속이게 만듭니다 (|| true)
         # 이렇게 하면 빨간 X 대신 초록 체크가 뜨면서 로그를 자세히 볼 수 있어요! ㅋ
-        kubectl apply -f . --recursive || echo "⚠️ 아직 배포할 파일이 없거나 경로가 이상해요!"
+        kubectl apply -f ./ticketing-was --recursive 
 
         # 3. 재시작 (있으면 하고 없으면 말고! ㅋ)
-        kubectl rollout restart deployment ticketing-was-deploy || true
+        kubectl rollout restart deployment ticketing-was-deploy 
+
+        kubectl rollout status deployment/ticketing-was-deploy
