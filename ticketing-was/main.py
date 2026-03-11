@@ -101,6 +101,10 @@ def reserve_ticket(req: ReservationRequest):
                     "select_date": req.select_date, "select_time": req.select_time,
                     "place": req.place, "price": req.price
                 })
+        except Exception as e:  # 👈 이 부분을 105번 줄 바로 위에 추가!
+            print(f"Error during reservation: {e}")
+            # 필요한 경우 여기서 db.rollback() 등을 수행
+            return {"status": "error", "message": "예약 중 오류가 발생했습니다."}
 
         return {
             "status": "success",
