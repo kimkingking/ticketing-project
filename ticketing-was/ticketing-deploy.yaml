@@ -16,16 +16,19 @@ spec:
       - name: ticketing-was
         image: kingking4105/ticketing-was:latest
         imagePullPolicy: Always
-          ### workingDir: /app/data
+        workingDir: /app/data
+        env:
+        - name: DB_HOST
+          value: "mysql-service"
         ports:
         - containerPort: 8000
-          #    volumeMounts:
-          # - name: was-storage
-          # mountPath: /app/data
+        volumeMounts:
+        - name: was-storage
+          mountPath: /app/data
       volumes:
-      - name: was-storage  # 수정된 부분
-        # persistentVolumeClaim:
-        emptyDir: {}
+      - name: was-storage
+        persistentVolumeClaim:
+          claimName: was-nfs-pvc
 ---
 apiVersion: v1
 kind: Service
