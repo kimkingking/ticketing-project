@@ -28,7 +28,7 @@ class ReservationRequest(BaseModel):
 
 async def verify_turnstile(token: str) -> bool:
     if not TURNSTILE_SECRET_KEY:
-        return True
+        return False
     # JMeter 테스트를 위한 하이패스권 ㅋ
     if DEBUG_MODE and token == "JETER_TEST_TOKEN":
         return True
@@ -62,11 +62,11 @@ async def reserve_ticket(req: ReservationRequest):
                 conn.execute(update_query, {"id": req.seat_id})
 
                 insert_query = text("""
-                    INSERT INTO reservation (user_id, seat_id, perf_id, perf_title, select_date, select_time, place, price)
+                    INSERT INTO reservation (user_id, seat_id, seat_num,  perf_id, perf_title, select_date, select_time, place, price)
                     VALUES (:user_id, :seat_id, :perf_id, :perf_title, :select_date, :select_time, :place, :price)
                 """)
                 conn.execute(insert_query, {
-                    "user_id": req.user_id, "seat_id": req.seat_id,
+                    "user_id": req.user_id, "seat_id": req.seat_id, "seat_num": f"S-{req.seat_id}",
                     "perf_id": req.perf_id, "perf_title": req.perf_title,
                     "select_date": req.select_date, "select_time": req.select_time,
                     "place": req.place, "price": req.price
