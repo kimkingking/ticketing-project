@@ -1,154 +1,146 @@
-2026-03-16 11:28:35,960 INFO o.a.j.u.JMeterUtils: Setting Locale to en_EN
-2026-03-16 11:28:35,988 INFO o.a.j.JMeter: Loading user properties from: /home/bohye/tools/apache-jmeter-5.6.3/bin/user.properties
-2026-03-16 11:28:35,988 INFO o.a.j.JMeter: Loading system properties from: /home/bohye/tools/apache-jmeter-5.6.3/bin/system.properties
-2026-03-16 11:28:35,992 INFO o.a.j.JMeter: Copyright (c) 1998-2024 The Apache Software Foundation
-2026-03-16 11:28:35,993 INFO o.a.j.JMeter: Version 5.6.3
-2026-03-16 11:28:35,993 INFO o.a.j.JMeter: java.version=11.0.25
-2026-03-16 11:28:35,993 INFO o.a.j.JMeter: java.vm.name=OpenJDK 64-Bit Server VM
-2026-03-16 11:28:35,993 INFO o.a.j.JMeter: os.name=Linux
-2026-03-16 11:28:35,993 INFO o.a.j.JMeter: os.arch=amd64
-2026-03-16 11:28:35,993 INFO o.a.j.JMeter: os.version=5.14.0-611.5.1.el9_7.x86_64
-2026-03-16 11:28:35,993 INFO o.a.j.JMeter: file.encoding=UTF-8
-2026-03-16 11:28:35,993 INFO o.a.j.JMeter: java.awt.headless=true
-2026-03-16 11:28:35,993 INFO o.a.j.JMeter: Max memory     =1073741824
-2026-03-16 11:28:35,993 INFO o.a.j.JMeter: Available Processors =2
-2026-03-16 11:28:36,000 INFO o.a.j.JMeter: Default Locale=English (EN)
-2026-03-16 11:28:36,000 INFO o.a.j.JMeter: JMeter  Locale=English (EN)
-2026-03-16 11:28:36,000 INFO o.a.j.JMeter: JMeterHome=/home/bohye/tools/apache-jmeter-5.6.3
-2026-03-16 11:28:36,000 INFO o.a.j.JMeter: user.dir  =/home/bohye/ticketing-project/ticketing-was
-2026-03-16 11:28:36,000 INFO o.a.j.JMeter: PWD       =/home/bohye/ticketing-project/ticketing-was
-2026-03-16 11:28:36,001 INFO o.a.j.JMeter: IP: 127.0.0.1 Name: localhost.localdomain FullName: localhost
-2026-03-16 11:28:36,013 INFO o.a.j.s.FileServer: Default base='/home/bohye/ticketing-project/ticketing-was'
-2026-03-16 11:28:36,015 INFO o.a.j.s.FileServer: Set new base='/home/bohye/ticketing-project/ticketing-was'
-2026-03-16 11:28:36,218 INFO o.a.j.s.SaveService: Testplan (JMX) version: 2.2. Testlog (JTL) version: 2.2
-2026-03-16 11:28:36,252 INFO o.a.j.s.SaveService: Using SaveService properties version 5.0
-2026-03-16 11:28:36,256 INFO o.a.j.s.SaveService: Using SaveService properties file encoding UTF-8
-2026-03-16 11:28:36,260 INFO o.a.j.s.SaveService: Loading file: /home/bohye/ticketing-project/ticketing-was/real_queue_test.jmx
-2026-03-16 11:28:36,328 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/html is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
-2026-03-16 11:28:36,329 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for application/xhtml+xml is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
-2026-03-16 11:28:36,329 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for application/xml is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
-2026-03-16 11:28:36,329 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/xml is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
-2026-03-16 11:28:36,329 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/vnd.wap.wml is org.apache.jmeter.protocol.http.parser.RegexpHTMLParser
-2026-03-16 11:28:36,329 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/css is org.apache.jmeter.protocol.http.parser.CssParser
-2026-03-16 11:28:36,348 INFO o.a.j.JMeter: Creating summariser <summary>
-2026-03-16 11:28:36,369 INFO o.a.j.e.StandardJMeterEngine: Running the test!
-2026-03-16 11:28:36,374 INFO o.a.j.s.SampleEvent: List of sample_variables: []
-2026-03-16 11:28:36,374 INFO o.a.j.s.SampleEvent: List of sample_variables: []
-2026-03-16 11:28:36,385 INFO o.a.j.e.u.CompoundVariable: Note: Function class names must contain the string: '.functions.'
-2026-03-16 11:28:36,385 INFO o.a.j.e.u.CompoundVariable: Note: Function class names must not contain the string: '.gui.'
-2026-03-16 11:28:36,699 INFO o.a.j.JMeter: Running test (1773628116699)
-2026-03-16 11:28:36,726 INFO o.a.j.e.StandardJMeterEngine: Starting ThreadGroup: 1 : Users
-2026-03-16 11:28:36,726 INFO o.a.j.e.StandardJMeterEngine: Starting 100 threads for group Users.
-2026-03-16 11:28:36,726 INFO o.a.j.e.StandardJMeterEngine: Thread will continue on error
-2026-03-16 11:28:36,726 INFO o.a.j.t.ThreadGroup: Starting thread group... number=1 threads=100 ramp-up=10 delayedStart=false
-2026-03-16 11:28:36,789 INFO o.a.j.t.ThreadGroup: Started thread group number 1
-2026-03-16 11:28:36,789 INFO o.a.j.e.StandardJMeterEngine: All thread groups have been started
-2026-03-16 11:28:36,797 INFO o.a.j.t.JMeterThread: Thread started: Users 1-1
-2026-03-16 11:28:36,836 INFO o.a.j.p.h.s.HTTPHCAbstractImpl: Local host = localhost.localdomain
-2026-03-16 11:28:36,842 INFO o.a.j.p.h.s.HTTPHC4Impl: HTTP request retry count = 0
-2026-03-16 11:28:36,844 INFO o.a.j.s.SampleResult: Note: Sample TimeStamps are START times
-2026-03-16 11:28:36,844 INFO o.a.j.s.SampleResult: sampleresult.default.encoding is set to UTF-8
-2026-03-16 11:28:36,844 INFO o.a.j.s.SampleResult: sampleresult.useNanoTime=true
-2026-03-16 11:28:36,844 INFO o.a.j.s.SampleResult: sampleresult.nanoThreadSleep=5000
-2026-03-16 11:28:36,916 INFO o.a.j.t.JMeterThread: Thread started: Users 1-2
-2026-03-16 11:28:37,011 INFO o.a.j.t.JMeterThread: Thread started: Users 1-3
-2026-03-16 11:28:37,112 INFO o.a.j.t.JMeterThread: Thread started: Users 1-4
-2026-03-16 11:28:37,210 INFO o.a.j.t.JMeterThread: Thread started: Users 1-5
-2026-03-16 11:28:37,310 INFO o.a.j.t.JMeterThread: Thread started: Users 1-6
-2026-03-16 11:28:37,410 INFO o.a.j.t.JMeterThread: Thread started: Users 1-7
-2026-03-16 11:28:37,508 INFO o.a.j.t.JMeterThread: Thread started: Users 1-8
-2026-03-16 11:28:37,606 INFO o.a.j.t.JMeterThread: Thread started: Users 1-9
-2026-03-16 11:28:37,705 INFO o.a.j.t.JMeterThread: Thread started: Users 1-10
-2026-03-16 11:28:37,805 INFO o.a.j.t.JMeterThread: Thread started: Users 1-11
-2026-03-16 11:28:37,903 INFO o.a.j.t.JMeterThread: Thread started: Users 1-12
-2026-03-16 11:28:38,003 INFO o.a.j.t.JMeterThread: Thread started: Users 1-13
-2026-03-16 11:28:38,102 INFO o.a.j.t.JMeterThread: Thread started: Users 1-14
-2026-03-16 11:28:38,201 INFO o.a.j.t.JMeterThread: Thread started: Users 1-15
-2026-03-16 11:28:38,300 INFO o.a.j.t.JMeterThread: Thread started: Users 1-16
-2026-03-16 11:28:38,400 INFO o.a.j.t.JMeterThread: Thread started: Users 1-17
-2026-03-16 11:28:38,500 INFO o.a.j.t.JMeterThread: Thread started: Users 1-18
-2026-03-16 11:28:38,599 INFO o.a.j.t.JMeterThread: Thread started: Users 1-19
-2026-03-16 11:28:38,699 INFO o.a.j.t.JMeterThread: Thread started: Users 1-20
-2026-03-16 11:28:38,798 INFO o.a.j.t.JMeterThread: Thread started: Users 1-21
-2026-03-16 11:28:38,898 INFO o.a.j.t.JMeterThread: Thread started: Users 1-22
-2026-03-16 11:28:38,998 INFO o.a.j.t.JMeterThread: Thread started: Users 1-23
-2026-03-16 11:28:39,097 INFO o.a.j.t.JMeterThread: Thread started: Users 1-24
-2026-03-16 11:28:39,192 INFO o.a.j.t.JMeterThread: Thread started: Users 1-25
-2026-03-16 11:28:39,291 INFO o.a.j.t.JMeterThread: Thread started: Users 1-26
-2026-03-16 11:28:39,390 INFO o.a.j.t.JMeterThread: Thread started: Users 1-27
-2026-03-16 11:28:39,491 INFO o.a.j.t.JMeterThread: Thread started: Users 1-28
-2026-03-16 11:28:39,591 INFO o.a.j.t.JMeterThread: Thread started: Users 1-29
-2026-03-16 11:28:39,690 INFO o.a.j.t.JMeterThread: Thread started: Users 1-30
-2026-03-16 11:28:39,790 INFO o.a.j.t.JMeterThread: Thread started: Users 1-31
-2026-03-16 11:28:39,889 INFO o.a.j.t.JMeterThread: Thread started: Users 1-32
-2026-03-16 11:28:39,988 INFO o.a.j.t.JMeterThread: Thread started: Users 1-33
-2026-03-16 11:28:40,087 INFO o.a.j.t.JMeterThread: Thread started: Users 1-34
-2026-03-16 11:28:40,187 INFO o.a.j.t.JMeterThread: Thread started: Users 1-35
-2026-03-16 11:28:40,286 INFO o.a.j.t.JMeterThread: Thread started: Users 1-36
-2026-03-16 11:28:40,386 INFO o.a.j.t.JMeterThread: Thread started: Users 1-37
-2026-03-16 11:28:40,486 INFO o.a.j.t.JMeterThread: Thread started: Users 1-38
-2026-03-16 11:28:40,585 INFO o.a.j.t.JMeterThread: Thread started: Users 1-39
-2026-03-16 11:28:40,685 INFO o.a.j.t.JMeterThread: Thread started: Users 1-40
-2026-03-16 11:28:40,787 INFO o.a.j.t.JMeterThread: Thread started: Users 1-41
-2026-03-16 11:28:40,884 INFO o.a.j.t.JMeterThread: Thread started: Users 1-42
-2026-03-16 11:28:40,984 INFO o.a.j.t.JMeterThread: Thread started: Users 1-43
-2026-03-16 11:28:41,084 INFO o.a.j.t.JMeterThread: Thread started: Users 1-44
-2026-03-16 11:28:41,183 INFO o.a.j.t.JMeterThread: Thread started: Users 1-45
-2026-03-16 11:28:41,283 INFO o.a.j.t.JMeterThread: Thread started: Users 1-46
-2026-03-16 11:28:41,383 INFO o.a.j.t.JMeterThread: Thread started: Users 1-47
-2026-03-16 11:28:41,482 INFO o.a.j.t.JMeterThread: Thread started: Users 1-48
-2026-03-16 11:28:41,582 INFO o.a.j.t.JMeterThread: Thread started: Users 1-49
-2026-03-16 11:28:41,682 INFO o.a.j.t.JMeterThread: Thread started: Users 1-50
-2026-03-16 11:28:41,777 INFO o.a.j.t.JMeterThread: Thread started: Users 1-51
-2026-03-16 11:28:41,875 INFO o.a.j.t.JMeterThread: Thread started: Users 1-52
-2026-03-16 11:28:41,976 INFO o.a.j.t.JMeterThread: Thread started: Users 1-53
-2026-03-16 11:28:42,075 INFO o.a.j.t.JMeterThread: Thread started: Users 1-54
-2026-03-16 11:28:42,175 INFO o.a.j.t.JMeterThread: Thread started: Users 1-55
-2026-03-16 11:28:42,275 INFO o.a.j.t.JMeterThread: Thread started: Users 1-56
-2026-03-16 11:28:42,376 INFO o.a.j.t.JMeterThread: Thread started: Users 1-57
-2026-03-16 11:28:42,474 INFO o.a.j.t.JMeterThread: Thread started: Users 1-58
-2026-03-16 11:28:42,573 INFO o.a.j.t.JMeterThread: Thread started: Users 1-59
-2026-03-16 11:28:42,673 INFO o.a.j.t.JMeterThread: Thread started: Users 1-60
-2026-03-16 11:28:42,773 INFO o.a.j.t.JMeterThread: Thread started: Users 1-61
-2026-03-16 11:28:42,872 INFO o.a.j.t.JMeterThread: Thread started: Users 1-62
-2026-03-16 11:28:42,972 INFO o.a.j.t.JMeterThread: Thread started: Users 1-63
-2026-03-16 11:28:43,074 INFO o.a.j.t.JMeterThread: Thread started: Users 1-64
-2026-03-16 11:28:43,172 INFO o.a.j.t.JMeterThread: Thread started: Users 1-65
-2026-03-16 11:28:43,272 INFO o.a.j.t.JMeterThread: Thread started: Users 1-66
-2026-03-16 11:28:43,372 INFO o.a.j.t.JMeterThread: Thread started: Users 1-67
-2026-03-16 11:28:43,472 INFO o.a.j.t.JMeterThread: Thread started: Users 1-68
-2026-03-16 11:28:43,571 INFO o.a.j.t.JMeterThread: Thread started: Users 1-69
-2026-03-16 11:28:43,672 INFO o.a.j.t.JMeterThread: Thread started: Users 1-70
-2026-03-16 11:28:43,771 INFO o.a.j.t.JMeterThread: Thread started: Users 1-71
-2026-03-16 11:28:43,871 INFO o.a.j.t.JMeterThread: Thread started: Users 1-72
-2026-03-16 11:28:43,970 INFO o.a.j.t.JMeterThread: Thread started: Users 1-73
-2026-03-16 11:28:44,070 INFO o.a.j.t.JMeterThread: Thread started: Users 1-74
-2026-03-16 11:28:44,171 INFO o.a.j.t.JMeterThread: Thread started: Users 1-75
-2026-03-16 11:28:44,272 INFO o.a.j.t.JMeterThread: Thread started: Users 1-76
-2026-03-16 11:28:44,369 INFO o.a.j.t.JMeterThread: Thread started: Users 1-77
-2026-03-16 11:28:44,468 INFO o.a.j.t.JMeterThread: Thread started: Users 1-78
-2026-03-16 11:28:44,568 INFO o.a.j.t.JMeterThread: Thread started: Users 1-79
-2026-03-16 11:28:44,667 INFO o.a.j.t.JMeterThread: Thread started: Users 1-80
-2026-03-16 11:28:44,767 INFO o.a.j.t.JMeterThread: Thread started: Users 1-81
-2026-03-16 11:28:44,925 INFO o.a.j.t.JMeterThread: Thread started: Users 1-82
-2026-03-16 11:28:44,966 INFO o.a.j.t.JMeterThread: Thread started: Users 1-83
-2026-03-16 11:28:45,066 INFO o.a.j.t.JMeterThread: Thread started: Users 1-84
-2026-03-16 11:28:45,166 INFO o.a.j.t.JMeterThread: Thread started: Users 1-85
-2026-03-16 11:28:45,266 INFO o.a.j.t.JMeterThread: Thread started: Users 1-86
-2026-03-16 11:28:45,366 INFO o.a.j.t.JMeterThread: Thread started: Users 1-87
-2026-03-16 11:28:45,465 INFO o.a.j.t.JMeterThread: Thread started: Users 1-88
-2026-03-16 11:28:45,565 INFO o.a.j.t.JMeterThread: Thread started: Users 1-89
-2026-03-16 11:28:45,665 INFO o.a.j.t.JMeterThread: Thread started: Users 1-90
-2026-03-16 11:28:45,765 INFO o.a.j.t.JMeterThread: Thread started: Users 1-91
-2026-03-16 11:28:45,865 INFO o.a.j.t.JMeterThread: Thread started: Users 1-92
-2026-03-16 11:28:45,964 INFO o.a.j.t.JMeterThread: Thread started: Users 1-93
-2026-03-16 11:28:46,066 INFO o.a.j.t.JMeterThread: Thread started: Users 1-94
-2026-03-16 11:28:46,160 INFO o.a.j.t.JMeterThread: Thread started: Users 1-95
-2026-03-16 11:28:46,260 INFO o.a.j.t.JMeterThread: Thread started: Users 1-96
-2026-03-16 11:28:46,359 INFO o.a.j.t.JMeterThread: Thread started: Users 1-97
-2026-03-16 11:28:46,446 INFO o.a.j.t.JMeterThread: Thread started: Users 1-98
-2026-03-16 11:28:46,562 INFO o.a.j.t.JMeterThread: Thread started: Users 1-99
-2026-03-16 11:28:46,662 INFO o.a.j.t.JMeterThread: Thread started: Users 1-100
-2026-03-16 11:29:00,022 INFO o.a.j.r.Summariser: summary +  61499 in 00:00:23 = 2639.2/s Avg:    29 Min:     1 Max:   317 Err: 61499 (100.00%) Active: 100 Started: 100 Finished: 0
-2026-03-16 11:29:09,656 INFO o.a.j.r.ResultCollector: Shutdown hook started
-2026-03-16 11:29:09,657 INFO o.a.j.r.ResultCollector: Shutdown hook ended
+2026-03-16 14:36:02,276 INFO o.a.j.u.JMeterUtils: Setting Locale to en_EN
+2026-03-16 14:36:02,306 INFO o.a.j.JMeter: Loading user properties from: /home/bohye/apache-jmeter-5.6.3/bin/user.properties
+2026-03-16 14:36:02,306 INFO o.a.j.JMeter: Loading system properties from: /home/bohye/apache-jmeter-5.6.3/bin/system.properties
+2026-03-16 14:36:02,316 INFO o.a.j.JMeter: Copyright (c) 1998-2024 The Apache Software Foundation
+2026-03-16 14:36:02,316 INFO o.a.j.JMeter: Version 5.6.3
+2026-03-16 14:36:02,316 INFO o.a.j.JMeter: java.version=11.0.25
+2026-03-16 14:36:02,316 INFO o.a.j.JMeter: java.vm.name=OpenJDK 64-Bit Server VM
+2026-03-16 14:36:02,316 INFO o.a.j.JMeter: os.name=Linux
+2026-03-16 14:36:02,317 INFO o.a.j.JMeter: os.arch=amd64
+2026-03-16 14:36:02,317 INFO o.a.j.JMeter: os.version=5.14.0-611.5.1.el9_7.x86_64
+2026-03-16 14:36:02,317 INFO o.a.j.JMeter: file.encoding=UTF-8
+2026-03-16 14:36:02,318 INFO o.a.j.JMeter: java.awt.headless=true
+2026-03-16 14:36:02,318 INFO o.a.j.JMeter: Max memory     =1073741824
+2026-03-16 14:36:02,319 INFO o.a.j.JMeter: Available Processors =2
+2026-03-16 14:36:02,327 INFO o.a.j.JMeter: Default Locale=English (EN)
+2026-03-16 14:36:02,327 INFO o.a.j.JMeter: JMeter  Locale=English (EN)
+2026-03-16 14:36:02,328 INFO o.a.j.JMeter: JMeterHome=/home/bohye/apache-jmeter-5.6.3
+2026-03-16 14:36:02,328 INFO o.a.j.JMeter: user.dir  =/home/bohye/ticketing-project/ticketing-was
+2026-03-16 14:36:02,328 INFO o.a.j.JMeter: PWD       =/home/bohye/ticketing-project/ticketing-was
+2026-03-16 14:36:02,328 INFO o.a.j.JMeter: IP: 127.0.0.1 Name: localhost.localdomain FullName: localhost
+2026-03-16 14:36:02,343 INFO o.a.j.s.FileServer: Default base='/home/bohye/ticketing-project/ticketing-was'
+2026-03-16 14:36:02,345 INFO o.a.j.s.FileServer: Set new base='/home/bohye'
+2026-03-16 14:36:02,588 INFO o.a.j.s.SaveService: Testplan (JMX) version: 2.2. Testlog (JTL) version: 2.2
+2026-03-16 14:36:02,617 INFO o.a.j.s.SaveService: Using SaveService properties version 5.0
+2026-03-16 14:36:02,621 INFO o.a.j.s.SaveService: Using SaveService properties file encoding UTF-8
+2026-03-16 14:36:02,628 INFO o.a.j.s.SaveService: Loading file: /home/bohye/real_queue_test.jmx
+2026-03-16 14:36:02,691 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/html is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
+2026-03-16 14:36:02,692 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for application/xhtml+xml is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
+2026-03-16 14:36:02,692 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for application/xml is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
+2026-03-16 14:36:02,692 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/xml is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
+2026-03-16 14:36:02,692 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/vnd.wap.wml is org.apache.jmeter.protocol.http.parser.RegexpHTMLParser
+2026-03-16 14:36:02,692 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/css is org.apache.jmeter.protocol.http.parser.CssParser
+2026-03-16 14:36:02,712 INFO o.a.j.JMeter: Creating summariser <summary>
+2026-03-16 14:36:02,739 INFO o.a.j.e.StandardJMeterEngine: Running the test!
+2026-03-16 14:36:02,744 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2026-03-16 14:36:02,744 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2026-03-16 14:36:02,757 INFO o.a.j.e.u.CompoundVariable: Note: Function class names must contain the string: '.functions.'
+2026-03-16 14:36:02,758 INFO o.a.j.e.u.CompoundVariable: Note: Function class names must not contain the string: '.gui.'
+2026-03-16 14:36:03,126 INFO o.a.j.JMeter: Running test (1773639363126)
+2026-03-16 14:36:03,164 INFO o.a.j.e.StandardJMeterEngine: Starting ThreadGroup: 1 : Users
+2026-03-16 14:36:03,164 INFO o.a.j.e.StandardJMeterEngine: Starting 100 threads for group Users.
+2026-03-16 14:36:03,164 INFO o.a.j.e.StandardJMeterEngine: Thread will continue on error
+2026-03-16 14:36:03,164 INFO o.a.j.t.ThreadGroup: Starting thread group... number=1 threads=100 ramp-up=10 delayedStart=false
+2026-03-16 14:36:03,267 INFO o.a.j.t.ThreadGroup: Started thread group number 1
+2026-03-16 14:36:03,268 INFO o.a.j.e.StandardJMeterEngine: All thread groups have been started
+2026-03-16 14:36:03,268 INFO o.a.j.t.JMeterThread: Thread started: Users 1-1
+2026-03-16 14:36:03,314 INFO o.a.j.p.h.s.HTTPHCAbstractImpl: Local host = localhost.localdomain
+2026-03-16 14:36:03,323 INFO o.a.j.p.h.s.HTTPHC4Impl: HTTP request retry count = 0
+2026-03-16 14:36:03,324 INFO o.a.j.s.SampleResult: Note: Sample TimeStamps are START times
+2026-03-16 14:36:03,324 INFO o.a.j.s.SampleResult: sampleresult.default.encoding is set to UTF-8
+2026-03-16 14:36:03,324 INFO o.a.j.s.SampleResult: sampleresult.useNanoTime=true
+2026-03-16 14:36:03,324 INFO o.a.j.s.SampleResult: sampleresult.nanoThreadSleep=5000
+2026-03-16 14:36:03,362 INFO o.a.j.t.JMeterThread: Thread started: Users 1-2
+2026-03-16 14:36:03,462 INFO o.a.j.t.JMeterThread: Thread started: Users 1-3
+2026-03-16 14:36:03,465 INFO o.a.j.r.Summariser: summary +      1 in 00:00:00 =    3.0/s Avg:    62 Min:    62 Max:    62 Err:     1 (100.00%) Active: 3 Started: 3 Finished: 0
+2026-03-16 14:36:03,556 INFO o.a.j.t.JMeterThread: Thread started: Users 1-4
+2026-03-16 14:36:03,657 INFO o.a.j.t.JMeterThread: Thread started: Users 1-5
+2026-03-16 14:36:03,756 INFO o.a.j.t.JMeterThread: Thread started: Users 1-6
+2026-03-16 14:36:03,857 INFO o.a.j.t.JMeterThread: Thread started: Users 1-7
+2026-03-16 14:36:03,953 INFO o.a.j.t.JMeterThread: Thread started: Users 1-8
+2026-03-16 14:36:04,054 INFO o.a.j.t.JMeterThread: Thread started: Users 1-9
+2026-03-16 14:36:04,147 INFO o.a.j.t.JMeterThread: Thread started: Users 1-10
+2026-03-16 14:36:04,257 INFO o.a.j.t.JMeterThread: Thread started: Users 1-11
+2026-03-16 14:36:04,356 INFO o.a.j.t.JMeterThread: Thread started: Users 1-12
+2026-03-16 14:36:04,455 INFO o.a.j.t.JMeterThread: Thread started: Users 1-13
+2026-03-16 14:36:04,555 INFO o.a.j.t.JMeterThread: Thread started: Users 1-14
+2026-03-16 14:36:04,658 INFO o.a.j.t.JMeterThread: Thread started: Users 1-15
+2026-03-16 14:36:04,742 INFO o.a.j.t.JMeterThread: Thread started: Users 1-16
+2026-03-16 14:36:04,835 INFO o.a.j.t.JMeterThread: Thread started: Users 1-17
+2026-03-16 14:36:04,934 INFO o.a.j.t.JMeterThread: Thread started: Users 1-18
+2026-03-16 14:36:05,034 INFO o.a.j.t.JMeterThread: Thread started: Users 1-19
+2026-03-16 14:36:05,131 INFO o.a.j.t.JMeterThread: Thread started: Users 1-20
+2026-03-16 14:36:05,233 INFO o.a.j.t.JMeterThread: Thread started: Users 1-21
+2026-03-16 14:36:05,330 INFO o.a.j.t.JMeterThread: Thread started: Users 1-22
+2026-03-16 14:36:05,428 INFO o.a.j.t.JMeterThread: Thread started: Users 1-23
+2026-03-16 14:36:05,527 INFO o.a.j.t.JMeterThread: Thread started: Users 1-24
+2026-03-16 14:36:05,625 INFO o.a.j.t.JMeterThread: Thread started: Users 1-25
+2026-03-16 14:36:05,724 INFO o.a.j.t.JMeterThread: Thread started: Users 1-26
+2026-03-16 14:36:05,824 INFO o.a.j.t.JMeterThread: Thread started: Users 1-27
+2026-03-16 14:36:05,923 INFO o.a.j.t.JMeterThread: Thread started: Users 1-28
+2026-03-16 14:36:06,024 INFO o.a.j.t.JMeterThread: Thread started: Users 1-29
+2026-03-16 14:36:06,120 INFO o.a.j.t.JMeterThread: Thread started: Users 1-30
+2026-03-16 14:36:06,220 INFO o.a.j.t.JMeterThread: Thread started: Users 1-31
+2026-03-16 14:36:06,316 INFO o.a.j.t.JMeterThread: Thread started: Users 1-32
+2026-03-16 14:36:06,415 INFO o.a.j.t.JMeterThread: Thread started: Users 1-33
+2026-03-16 14:36:06,526 INFO o.a.j.t.JMeterThread: Thread started: Users 1-34
+2026-03-16 14:36:06,619 INFO o.a.j.t.JMeterThread: Thread started: Users 1-35
+2026-03-16 14:36:06,712 INFO o.a.j.t.JMeterThread: Thread started: Users 1-36
+2026-03-16 14:36:06,812 INFO o.a.j.t.JMeterThread: Thread started: Users 1-37
+2026-03-16 14:36:06,911 INFO o.a.j.t.JMeterThread: Thread started: Users 1-38
+2026-03-16 14:36:07,010 INFO o.a.j.t.JMeterThread: Thread started: Users 1-39
+2026-03-16 14:36:07,108 INFO o.a.j.t.JMeterThread: Thread started: Users 1-40
+2026-03-16 14:36:07,208 INFO o.a.j.t.JMeterThread: Thread started: Users 1-41
+2026-03-16 14:36:07,308 INFO o.a.j.t.JMeterThread: Thread started: Users 1-42
+2026-03-16 14:36:07,415 INFO o.a.j.t.JMeterThread: Thread started: Users 1-43
+2026-03-16 14:36:07,508 INFO o.a.j.t.JMeterThread: Thread started: Users 1-44
+2026-03-16 14:36:07,607 INFO o.a.j.t.JMeterThread: Thread started: Users 1-45
+2026-03-16 14:36:07,705 INFO o.a.j.t.JMeterThread: Thread started: Users 1-46
+2026-03-16 14:36:07,807 INFO o.a.j.t.JMeterThread: Thread started: Users 1-47
+2026-03-16 14:36:07,905 INFO o.a.j.t.JMeterThread: Thread started: Users 1-48
+2026-03-16 14:36:08,004 INFO o.a.j.t.JMeterThread: Thread started: Users 1-49
+2026-03-16 14:36:08,103 INFO o.a.j.t.JMeterThread: Thread started: Users 1-50
+2026-03-16 14:36:08,202 INFO o.a.j.t.JMeterThread: Thread started: Users 1-51
+2026-03-16 14:36:08,310 INFO o.a.j.t.JMeterThread: Thread started: Users 1-52
+2026-03-16 14:36:08,409 INFO o.a.j.t.JMeterThread: Thread started: Users 1-53
+2026-03-16 14:36:08,507 INFO o.a.j.t.JMeterThread: Thread started: Users 1-54
+2026-03-16 14:36:08,607 INFO o.a.j.t.JMeterThread: Thread started: Users 1-55
+2026-03-16 14:36:08,709 INFO o.a.j.t.JMeterThread: Thread started: Users 1-56
+2026-03-16 14:36:08,808 INFO o.a.j.t.JMeterThread: Thread started: Users 1-57
+2026-03-16 14:36:08,907 INFO o.a.j.t.JMeterThread: Thread started: Users 1-58
+2026-03-16 14:36:09,007 INFO o.a.j.t.JMeterThread: Thread started: Users 1-59
+2026-03-16 14:36:09,107 INFO o.a.j.t.JMeterThread: Thread started: Users 1-60
+2026-03-16 14:36:09,204 INFO o.a.j.t.JMeterThread: Thread started: Users 1-61
+2026-03-16 14:36:09,304 INFO o.a.j.t.JMeterThread: Thread started: Users 1-62
+2026-03-16 14:36:09,403 INFO o.a.j.t.JMeterThread: Thread started: Users 1-63
+2026-03-16 14:36:09,502 INFO o.a.j.t.JMeterThread: Thread started: Users 1-64
+2026-03-16 14:36:09,602 INFO o.a.j.t.JMeterThread: Thread started: Users 1-65
+2026-03-16 14:36:09,701 INFO o.a.j.t.JMeterThread: Thread started: Users 1-66
+2026-03-16 14:36:09,802 INFO o.a.j.t.JMeterThread: Thread started: Users 1-67
+2026-03-16 14:36:09,901 INFO o.a.j.t.JMeterThread: Thread started: Users 1-68
+2026-03-16 14:36:10,001 INFO o.a.j.t.JMeterThread: Thread started: Users 1-69
+2026-03-16 14:36:10,100 INFO o.a.j.t.JMeterThread: Thread started: Users 1-70
+2026-03-16 14:36:10,200 INFO o.a.j.t.JMeterThread: Thread started: Users 1-71
+2026-03-16 14:36:10,299 INFO o.a.j.t.JMeterThread: Thread started: Users 1-72
+2026-03-16 14:36:10,399 INFO o.a.j.t.JMeterThread: Thread started: Users 1-73
+2026-03-16 14:36:10,498 INFO o.a.j.t.JMeterThread: Thread started: Users 1-74
+2026-03-16 14:36:10,597 INFO o.a.j.t.JMeterThread: Thread started: Users 1-75
+2026-03-16 14:36:10,697 INFO o.a.j.t.JMeterThread: Thread started: Users 1-76
+2026-03-16 14:36:10,797 INFO o.a.j.t.JMeterThread: Thread started: Users 1-77
+2026-03-16 14:36:10,896 INFO o.a.j.t.JMeterThread: Thread started: Users 1-78
+2026-03-16 14:36:10,996 INFO o.a.j.t.JMeterThread: Thread started: Users 1-79
+2026-03-16 14:36:11,095 INFO o.a.j.t.JMeterThread: Thread started: Users 1-80
+2026-03-16 14:36:11,193 INFO o.a.j.t.JMeterThread: Thread started: Users 1-81
+2026-03-16 14:36:11,294 INFO o.a.j.t.JMeterThread: Thread started: Users 1-82
+2026-03-16 14:36:11,391 INFO o.a.j.t.JMeterThread: Thread started: Users 1-83
+2026-03-16 14:36:11,490 INFO o.a.j.t.JMeterThread: Thread started: Users 1-84
+2026-03-16 14:36:11,590 INFO o.a.j.t.JMeterThread: Thread started: Users 1-85
+2026-03-16 14:36:11,689 INFO o.a.j.t.JMeterThread: Thread started: Users 1-86
+2026-03-16 14:36:11,788 INFO o.a.j.t.JMeterThread: Thread started: Users 1-87
+2026-03-16 14:36:11,888 INFO o.a.j.t.JMeterThread: Thread started: Users 1-88
+2026-03-16 14:36:11,988 INFO o.a.j.t.JMeterThread: Thread started: Users 1-89
+2026-03-16 14:36:12,087 INFO o.a.j.t.JMeterThread: Thread started: Users 1-90
+2026-03-16 14:36:12,187 INFO o.a.j.t.JMeterThread: Thread started: Users 1-91
+2026-03-16 14:36:12,281 INFO o.a.j.r.ResultCollector: Shutdown hook started
+2026-03-16 14:36:12,283 INFO o.a.j.r.ResultCollector: Shutdown hook ended
+2026-03-16 14:36:12,287 INFO o.a.j.t.JMeterThread: Thread started: Users 1-92
