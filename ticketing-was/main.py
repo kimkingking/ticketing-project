@@ -1,10 +1,12 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
-from database import engine, rd
+from database import engine, rd # 여기도 필요합니다!
 import login
 import signin
 import reservation
+
+app = FastAPI()
 
 # CORS 설정 (보혜님의 실제 환경에 맞춘 업데이트)
 origins = [
@@ -37,7 +39,6 @@ def read_root():
 @app.get("/db-test")
 def test_db():
     try:
-        # reservation.py에서 가져온 engine을 사용!
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))
             return {"status": "success", "db_result": "Connected to MariaDB!"}
