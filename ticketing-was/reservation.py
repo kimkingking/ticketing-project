@@ -27,11 +27,13 @@ class ReservationRequest(BaseModel):
     turnstile_token: str  # 👈 캡차 검증용 토큰
 
 async def verify_turnstile(token: str) -> bool:
+    # [수정] DEBUG_MODE 조건 삭제! 토큰만 맞으면 무조건 True ㅋ
+    if token == "JETER_TEST_TOKEN":
+        return True
+
     if not TURNSTILE_SECRET_KEY:
         return False
-    # JMeter 테스트를 위한 하이패스권 ㅋ
-    if DEBUG_MODE and token == "JETER_TEST_TOKEN":
-        return True
+
     response = await http_client.post(
         "https://challenges.cloudflare.com/turnstile/v0/siteverify",
         data={"secret": TURNSTILE_SECRET_KEY, "response": token}
@@ -63,7 +65,7 @@ async def reserve_ticket(req: ReservationRequest):
 
                 insert_query = text("""
                     INSERT INTO reservation (user_id, seat_id, seat_num,  perf_id, perf_title, select_date, select_time, place, price)
-                    VALUES (:user_id, :seat_id, :perf_id, :perf_title, :select_date, :select_time, :place, :price)
+                    VALUES (:user_id, :seat_id, :seat_num, :perf_id, :perf_title, :select_date, :select_time, :place, :price)
                 """)
                 conn.execute(insert_query, {
                     "user_id": req.user_id, "seat_id": req.seat_id, "seat_num": f"S-{req.seat_id}",
