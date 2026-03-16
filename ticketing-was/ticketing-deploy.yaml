@@ -22,6 +22,12 @@ spec:
           value: "mysql-service"
         ports:
         - containerPort: 8000
+        env:
+        - name: TURNSTILE_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: captcha-secret
+              key: turnstile-key
         volumeMounts:
         - name: was-storage
           #mountPath: /app/data
