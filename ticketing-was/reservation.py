@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import text
 
-# 🌟 반전: 팀원분이 이미 만들어둔 창고(database.py)에서 도구를 꺼내옵니다!
+# 팀원분이 만들어둔 창고(database.py)에서 도구 꺼내오기
 from database import engine, rd
 
 # 환경변수 세팅
@@ -24,7 +24,7 @@ class ReservationRequest(BaseModel):
     select_time: str
     place: str
     price: int
-    turnstile_token: str  # 👈 캡차 검증
+    turnstile_token: str  # 캡차 검증
 
 async def verify_turnstile(token: str) -> bool:
     if not TURNSTILE_SECRET_KEY:
