@@ -16,7 +16,7 @@ spec:
       - name: ticketing-was
         image: kingking4105/ticketing-was:latest
         imagePullPolicy: Always
-        workingDir: /app/data
+        workingDir: /app
         env:
         - name: DB_HOST
           value: "mysql-service"
@@ -24,7 +24,8 @@ spec:
         - containerPort: 8000
         volumeMounts:
         - name: was-storage
-          mountPath: /app/data
+          #mountPath: /app/data
+          mountPath: /app
       volumes:
       - name: was-storage
         persistentVolumeClaim:
