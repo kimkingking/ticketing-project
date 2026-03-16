@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ticketing-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: "selfsigned"
+    # 테스트를 위해 보안 플러그인은 빼고, rate-limit만 남깁니다! ㅋ
+    konghq.com/plugins: "ticketing-rate-limit"
+spec:
+  ingressClassName: kong
+  rules:
+  - host: www.pulseticket.ke
+    http:
+      paths:
+      - path: /api/reservations
+        pathType: Prefix
+        backend:
+          service:
+            name: ticketing-was-service
+            port:
+              number: 80
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web-service
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - www.pulseticket.ke
+    secretName: ticketing-cluster

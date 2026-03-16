@@ -6,3 +6,4 @@ cryptography
 redis
 pyjwt
 python-multipart
+httpx
