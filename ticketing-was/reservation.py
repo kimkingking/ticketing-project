@@ -3,14 +3,12 @@ import time
 import httpx
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from sqlalchemy import create_engine, text
-import redis
+from sqlalchemy import text
 
-# 🌟 DB와 Redis 연결 도구를 여기서 만듭니다!
-DB_URL = "mysql+pymysql://was_user:1234@mysql-service:3306/ticket?charset=utf8mb4"
-engine = create_engine(DB_URL, echo=True)
-rd = redis.Redis(host='redis-service', port=6379, db=0, decode_responses=True)
+# 🌟 반전: 팀원분이 이미 만들어둔 창고(database.py)에서 도구를 꺼내옵니다!
+from database import engine, rd
 
+# 환경변수 세팅
 DEBUG_MODE = os.getenv("DEBUG_MODE", "False") == "True"
 TURNSTILE_SECRET_KEY = os.getenv("TURNSTILE_SECRET_KEY")
 
@@ -26,7 +24,7 @@ class ReservationRequest(BaseModel):
     select_time: str
     place: str
     price: int
-    turnstile_token: str  # 👈 캡차 검증을 위해 반드시 필요합니다.
+    turnstile_token: str  # 👈 캡차 검증
 
 async def verify_turnstile(token: str) -> bool:
     if not TURNSTILE_SECRET_KEY:
