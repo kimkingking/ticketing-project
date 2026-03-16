@@ -28,7 +28,7 @@ app.add_middleware(
 # 팀원분 & 보혜님 라우터 등록
 app.include_router(login.router)
 app.include_router(signin.router)
-app.include_router(reservation.router)
+app.include_router(reservation.router, prefix="/api/reservations")
 
 # --- 보혜님의 나머지 기능들을 여기에 그대로 유지합니다! ㅋ ---
 
