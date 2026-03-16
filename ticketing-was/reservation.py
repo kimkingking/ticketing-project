@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import text
 
-# 팀원분이 만들어둔 창고(database.py)에서 도구 꺼내오기
+# 팀원이 만들어둔 창고(database.py)에서 도구 꺼내오기
 from database import engine, rd
 
 # 환경변수 세팅
