@@ -1,19 +1,39 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
-# 🌟 reservation.py에서 라우터(매뉴얼)와 DB 도구(engine, rd)를 한꺼번에 다 가져옵니다!
-from reservation import router as reservation_router, engine, rd
+from database import engine, rd
+import login
+import signin
+import reservation
 
-app = FastAPI()
+# CORS 설정 (보혜님의 실제 환경에 맞춘 업데이트)
+origins = [
+    "http://www.pulseticket.ke:30007", 
+    "http://www.pulseticket.ke",
+    "http://10.4.0.150:30007", 
+    "http://10.4.0.203",       
+    "http://10.4.0.150",       
+]
 
-# 가져온 라우터를 조립합니다.
-app.include_router(reservation_router)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,       # 업데이트된 리스트 적용!
+    allow_credentials=True,
+    allow_methods=["*"],         # 모든 방식(GET, POST 등) 허용
+    allow_headers=["*"],         # 모든 헤더 허용
+)
 
-# [기본] 루트 페이지
+# 팀원분 & 보혜님 라우터 등록
+app.include_router(login.router)
+app.include_router(signin.router)
+app.include_router(reservation.router)
+
+# --- 보혜님의 나머지 기능들을 여기에 그대로 유지합니다! ㅋ ---
+
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to the Ticketing System v22 (2 Files Setup)!"}
+    return {"message": "Welcome to the Integrated Ticketing System! 🚀"}
 
-# [기능 1] DB 연결 테스트용
 @app.get("/db-test")
 def test_db():
     try:
@@ -24,18 +44,6 @@ def test_db():
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-# [기능 2] Redis 연결 테스트용
-@app.get("/redis-test")
-def test_redis():
-    try:
-        # reservation.py에서 가져온 rd를 사용!
-        rd.set("test_key", "Redis is Alive! 🚀")
-        value = rd.get("test_key")
-        return {"status": "success", "redis_result": value}
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
-
-# [기능 3] 예약 가능한 좌석 조회
 @app.get("/seats")
 def get_seats():
     try:
@@ -47,7 +55,6 @@ def get_seats():
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-# [기능 5] 특정 유저 정보 조회
 @app.get("/users/{user_id}")
 def get_user(user_id: str):
     try:
