@@ -3,7 +3,9 @@ uvicorn
 requests
 sqlalchemy
 pymysql
-cryptography
 redis
-pyjwt
+aioredis
+requests
+httpx
+pydantic
 python-multipart

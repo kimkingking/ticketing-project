@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ticketing-was-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ticketing-was
+  template:
+    metadata:
+      labels:
+        app: ticketing-was
+    spec:
+      containers:
+      - name: ticketing-was
+        image: kingking4105/ticketing-was:latest
+        imagePullPolicy: Always
+        workingDir: /app
+        env:
+        - name: DB_HOST
+          value: "mysql-service"
+        - name: TURNSTILE_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: captcha-secret
+              key: turnstile-key
+        ports:
+        - containerPort: 8000
