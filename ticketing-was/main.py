@@ -71,6 +71,26 @@ def get_user(user_id: str):
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
+@app.post("/next")
+def allow_next_users(count: int = 10): # 몇 명씩 들여보낼지
+    try:
+        # 가장 먼저 와서 줄을 선 사람부터 정해진 인원수만큼 이름을 호명(새치기 불가!)
+        top_users = rd.zrange("ticket_queue", 0, count - 1)
+        
+        if not top_users:
+            return {"status": "success", "message": "현재 대기열이 텅 비어있습니다."}
+        
+        rd.sadd("allowed_users", *top_users)
+        rd.zrem("ticket_queue", *top_users)
+        
+        return {
+            "status": "success",
+            "message": f"{len(top_users)}명의 유저가 입장 허가를 받았습니다!",
+            "allowed_users": top_users
+        }
+    except Exception as e:
+        return {"status": "error", "message": f"대기열 이동 중 오류 발생: {str(e)}"}
+
 @app.get("/")
 async def root():
     return {"status": "Secure Service Running"}
