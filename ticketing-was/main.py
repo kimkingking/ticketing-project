@@ -94,3 +94,23 @@ def allow_next_users(count: int = 10): # 몇 명씩 들여보낼지
 @app.get("/")
 async def root():
     return {"status": "Secure Service Running"}
+
+@app.post("/")
+async def root_post(data: dict = None): # 데이터를 받을 수 있게 설정
+    return {"message": "Safe Ticketing System - POST Accepted"}
+@app.middleware("http")
+async def simple_waf_middleware(request: Request, call_next):
+    # 1. URL 파라미터(query string)를 검사
+    query_params = str(request.query_params).lower()
+    
+    # 2. 차단할 키워드 리스트 (테스트용으로 'attack' 추가)
+    forbidden_words = ["attack", "delete", "drop", "select", "script"]
+    
+    if any(word in query_params for word in forbidden_words):
+        return JSONResponse(
+            status_code=403,
+            content={"detail": "WAF: Security Threat Detected (Forbidden Content)"}
+        )
+    
+    response = await call_next(request)
+    return response

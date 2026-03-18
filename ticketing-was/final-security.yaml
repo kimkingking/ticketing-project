@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ip-access-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    # 핵심: 사용자가 /api/로 들어오면, 파이썬한테는 / 로 전달해라!
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: ticket-backend-svc
+            port:
+              number: 8000
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ticket-frontend-svc
+            port:
+              number: 80
