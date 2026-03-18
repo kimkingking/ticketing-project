@@ -20,6 +20,11 @@ spec:
         env:
         - name: DB_HOST
           value: "mysql" # DB 파드와 통신하기 위한 호스트명
+        - name: TURNSTILE_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: captcha-secret
+              key: turnstile-key
         ports:
         - containerPort: 8000 # 파이썬 서버 포트
 ---
