@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from database import engine, rd # 여기도 필요합니다!
+from security import SecurityFilterMiddleware  # 만든 파일 불러오기
 import login
 import signin
 import reservation
@@ -29,6 +30,8 @@ app.add_middleware(
 app.include_router(login.router)
 app.include_router(signin.router)
 app.include_router(reservation.router, prefix="/api/reservations")
+# 보안 미들웨어 적용
+app.add_middleware(SecurityFilterMiddleware)
 
 # --- 보혜님의 나머지 기능들을 여기에 그대로 유지합니다! ㅋ ---
 
@@ -67,3 +70,7 @@ def get_user(user_id: str):
             return {"error": "User not found"}
     except Exception as e:
         return {"status": "error", "message": str(e)}
+
+@app.get("/")
+async def root():
+    return {"status": "Secure Service Running"}
