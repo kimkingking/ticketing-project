@@ -33,8 +33,8 @@ jobs:
         kubectl apply -f ./web/ticket-frontend.yaml
 
         # 확실하게 재시작해서 새 이미지 반영
-        kubectl rollout restart deployment/ticketing-was-deploy
+        kubectl rollout restart deployment/ticket-backend-deploy
         kubectl rollout restart deployment/ticket-frontend-deploy
         # 완료 대기
-        kubectl rollout status deployment/ticketing-was-deploy
+        kubectl rollout status deployment/ticket-backend-deploy
         kubectl rollout status deployment/ticket-frontend-deploy
