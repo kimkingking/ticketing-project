@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ticket-frontend-deploy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ticket-frontend
+  template:
+    metadata:
+      labels:
+        app: ticket-frontend
+    spec:
+      containers:
+      - name: nginx-frontend
+        # 💡 새로 만든 1.06 버전 명시 (403 Forbidden 해결된 버전)
+        image: leeseonghoon234/ticket-web:1.06
+        ports:
+        - containerPort: 80
+        - containerPort: 443
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ticket-frontend-svc
+spec:
+  type: NodePort # 외부 브라우저에서 접속할 수 있도록 개방
+  selector:
+    app: ticket-frontend
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+    nodePort: 30007 # HTTP 접속 포트
+  - name: https
+    port: 443
+    targetPort: 443
+    nodePort: 30443 # HTTPS 접속 포트
