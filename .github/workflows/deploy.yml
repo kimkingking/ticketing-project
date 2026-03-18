@@ -2,7 +2,7 @@ name: Ticketing System CI/CD
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "test-main" ]
 
 jobs:
   build-and-deploy:
