@@ -16,6 +16,7 @@ spec:
       - name: nginx-frontend
         # 💡 새로 만든 1.06 버전 명시 (403 Forbidden 해결된 버전)
         image: leeseonghoon234/ticket-web:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 80
         - containerPort: 443
