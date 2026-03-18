@@ -30,9 +30,11 @@ jobs:
         # 핵심 수정: 에러 나는 ns.json 무시하고, 실제 배포 파일만 실행!
         # 파일 이름을 정확하게 지정해 주는 게 가장 안전합니다.
         kubectl apply -f ./ticketing-was/ticketing-deploy.yaml
+        kubectl apply -f ./web/ticket-frontend.yaml
 
         # 확실하게 재시작해서 새 이미지 반영
         kubectl rollout restart deployment/ticketing-was-deploy
-
+        kubectl rollout restart deployment/ticket-frontend-deploy
         # 완료 대기
         kubectl rollout status deployment/ticketing-was-deploy
+        kubectl rollout status deployment/ticket-frontend-deploy
