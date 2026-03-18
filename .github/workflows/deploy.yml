@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: self-hosted  # <--- 방금 만든 'master' 비서를 호출합니다!
+    runs-on: self-hosted
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
@@ -17,24 +17,33 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Build and push Docker image
+    # 1. 보혜님의 WAS 이미지 빌드 및 푸시
+    - name: Build and push WAS image
       run: |
         docker build -t kingking4105/ticketing-was:latest ./ticketing-was
         docker push kingking4105/ticketing-was:latest
 
+    # 2. 배포 설정 및 이미지 정책 주입
     - name: Deploy to K8s
       run: |
         mkdir -p ~/.kube
         echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
 
-        # 핵심 수정: 에러 나는 ns.json 무시하고, 실제 배포 파일만 실행!
-        # 파일 이름을 정확하게 지정해 주는 게 가장 안전합니다.
-        kubectl apply -f ./ticketing-was/ticketing-deploy.yaml
+        # YAML 파일들 적용 (경로 확인 완료)
+        kubectl apply -f ./ticketing-was/ticket-backend.yaml
         kubectl apply -f ./web/ticket-frontend.yaml
 
-        # 확실하게 재시작해서 새 이미지 반영
+        # 핵심: 성훈님의 Web 이미지를 항상 최신으로 불러오도록 강제 설정
+        # 'frontend-container' 부분은 실제 YAML에 적힌 컨테이너 이름이어야 합니다.
+        kubectl set image deployment/ticket-frontend-deploy frontend-container=leeseonghoon234/ticket-web:latest
+        
+        # Always 정책 주입 (캐시 무시하고 무조건 다시 받기)
+        kubectl patch deployment ticket-frontend-deploy -p '{"spec":{"template":{"spec":{"containers":[{"name":"frontend-container","imagePullPolicy":"Always"}]}}}}'
+
+        # 3. 확실하게 재시작해서 새 이미지 반영
         kubectl rollout restart deployment/ticket-backend-deploy
         kubectl rollout restart deployment/ticket-frontend-deploy
-        # 완료 대기
+
+        # 4. 완료 대기
         kubectl rollout status deployment/ticket-backend-deploy
         kubectl rollout status deployment/ticket-frontend-deploy
