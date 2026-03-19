@@ -26,14 +26,14 @@ class PreCheckRequest(BaseModel):
 # [2. 최종 예매용] DB 좌석 저장 및 캡차 검증용
 class ReservationRequest(BaseModel):
     user_id: str
-    seat_id: int        
+    seat_num: str       # 💡 프론트에서 넘어오는 "S1" 형태 그대로 사용
     perf_id: str
     perf_title: str
     select_date: str
     select_time: str
     place: str
     price: int
-    turnstile_token: str
+    turnstile_token: str = "" # 에러 방지용 기본값 추가
 
 # ==========================================
 # [보조 함수] 캡차 검증
@@ -51,7 +51,7 @@ def verify_turnstile_sync(token: str) -> bool:
         return False
 
 # ==========================================
-# [API 1] 사전 진입 검증 (상세 페이지 - 대기열만 체크)
+# [API 1] 사전 진입 검증 (상세페이지 - 대기열만 체크)
 # ==========================================
 @router.post("/reserve")
 def reserve_precheck(req: PreCheckRequest):
@@ -61,12 +61,12 @@ def reserve_precheck(req: PreCheckRequest):
         if not is_allowed:
             now = time.time()
             rd.zadd("ticket_queue", {req.user_id: now}, nx=True)
-            
+
             # 내 순위 계산
             rank = rd.zrank("ticket_queue", req.user_id) + 1
             return {"status": "wait", "message": "아직 예매 순서가 아닙니다.", "waiting_number": rank}
 
-        # 💡 [핵심 수정] 캡차 검증 로직 완전 삭제! 대기열 통과 시 무조건 성공 처리
+        # 대기열 통과 시 무조건 성공 처리
         return {"status": "success", "message": "검증 완료. 좌석 선택으로 이동합니다."}
 
     except Exception as e:
@@ -78,39 +78,63 @@ def reserve_precheck(req: PreCheckRequest):
 @router.post("/confirm")
 def confirm_reservation(req: ReservationRequest):
     try:
-        # 💡 [핵심 수정] 실제 DB에 접근하기 직전인 이곳에서 캡차를 검증합니다!
-        is_test_mode = (DEBUG_MODE and req.turnstile_token == "JETER_TEST_TOKEN")
+        # 1. 캡차 검증 (테스트 모드일 땐 패스)
+        is_test_mode = (DEBUG_MODE and req.turnstile_token in ["", "JETER_TEST_TOKEN"])
         if not is_test_mode:
             if not verify_turnstile_sync(req.turnstile_token):
                 raise HTTPException(status_code=403, detail="캡차 검증이 실패했습니다. 다시 인증해주세요.")
 
         with engine.connect() as conn:
             with conn.begin():
-                # 좌석 락 및 상태 확인
-                query = text("SELECT status FROM seat WHERE seat_id = :id FOR UPDATE")
-                seat = conn.execute(query, {"id": req.seat_id}).fetchone()
+                # 2. 좌석 조회 (비관적 락으로 동시성 제어!)
+                query = text("""
+                    SELECT seat_id, status FROM seat
+                    WHERE perf_id = :perf_id
+                      AND perf_date = :date
+                      AND perf_time = :time
+                      AND seat_num = :seat_num
+                    FOR UPDATE
+                """)
+                seat = conn.execute(query, {
+                    "perf_id": req.perf_id, "date": req.select_date,
+                    "time": req.select_time, "seat_num": req.seat_num
+                }).fetchone()
 
-                if not seat or seat[0] != 'AVAILABLE':
-                    return {"status": "fail", "message": "이미 예약이 완료된 좌석입니다."}
+                real_seat_id = None
 
-                # 좌석 상태 업데이트
-                conn.execute(
-                    text("UPDATE seat SET status = 'OCCUPIED' WHERE seat_id = :id"),
-                    {"id": req.seat_id}
-                )
+                # 3-1. DB에 해당 좌석이 이미 만들어져 있을 때
+                if seat:
+                    if seat[1] != 'AVAILABLE':
+                        return {"status": "fail", "message": "이미 예약이 완료된 좌석입니다."}
 
-                # 예약 정보 삽입
+                    real_seat_id = seat[0]
+                    conn.execute(
+                        text("UPDATE seat SET status = 'OCCUPIED' WHERE seat_id = :id"),
+                        {"id": real_seat_id}
+                    )
+                # 3-2. DB에 좌석 데이터가 아예 없을 때 (지수님의 천재적인 로직!)
+                else:
+                    result = conn.execute(text("""
+                        INSERT INTO seat (seat_num, perf_id, perf_date, perf_time, status, version)
+                        VALUES (:seat_num, :perf_id, :date, :time, 'OCCUPIED', 1)
+                    """), {
+                        "seat_num": req.seat_num, "perf_id": req.perf_id,
+                        "date": req.select_date, "time": req.select_time
+                    })
+                    real_seat_id = result.lastrowid # 방금 만들어진 진짜 아이디
+
+                # 4. 예약 정보 삽입 (확보한 진짜 seat_id를 씁니다)
                 conn.execute(text("""
                     INSERT INTO reservation (user_id, seat_id, perf_id, perf_title, select_date, select_time, place, price)
                     VALUES (:user_id, :seat_id, :perf_id, :perf_title, :select_date, :select_time, :place, :price)
                 """), {
-                    "user_id": req.user_id, "seat_id": req.seat_id,
+                    "user_id": req.user_id, "seat_id": real_seat_id,
                     "perf_id": req.perf_id, "perf_title": req.perf_title,
                     "select_date": req.select_date, "select_time": req.select_time,
                     "place": req.place, "price": req.price
                 })
 
-        # 예매 성공 후 허가 명단에서 제거
+        # 예매 성공 후 대기열 허가 명단에서 깔끔하게 제거
         rd.srem("allowed_users", req.user_id)
         return {"status": "success", "message": "🎉 예매 성공! 즐거운 관람 되세요!"}
 
