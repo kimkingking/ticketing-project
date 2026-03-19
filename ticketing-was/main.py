@@ -8,7 +8,7 @@ import time
 # [설정] DB와 Redis 연결은 database.py에서 통합 관리합니다.
 from database import engine, rd
 
-# [보안] 별도로 작성하신 security.py에서 미들웨어를 가져옵니다.
+# [보안] 이중 방어용 커스텀 보안 미들웨어
 from security import SecurityFilterMiddleware
 
 # [라우터]
@@ -19,8 +19,14 @@ import reservation
 app = FastAPI()
 
 # ==========================================
-# [CORS 설정] 통합 리스트 (프론트엔드 IP/도메인)
+# [미들웨어 등록] 순서가 매우 중요합니다!
 # ==========================================
+
+# 1️⃣ 안쪽 껍질: 보안 WAF 미들웨어 (실제 비즈니스 로직 직전에 실행)
+app.add_middleware(SecurityFilterMiddleware)
+
+# 2️⃣ 바깥쪽 껍질: CORS 미들웨어 (FastAPI는 나중에 추가한 게 먼저 실행됨)
+# 이렇게 해야 브라우저의 OPTIONS 요청을 CORS가 먼저 안전하게 처리해줍니다.
 origins = [
     "http://www.pulseticket.ke:30007",
     "https://www.pulseticket.ke",  
@@ -33,18 +39,13 @@ origins = [
     "http://10.4.0.150"
 ]
 
-# 1. CORS 미들웨어를 먼저 등록합니다. (브라우저 요청 허용)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,       
-    allow_credentials=True,      # 쿠키 허용 
+    allow_credentials=True,     
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# 2. 보안 미들웨어를 등록합니다. (공격 패턴 차단)
-# CORS 미들웨어 다음에 위치하여 실제 API 로직 전단계에서 검사를 수행합니다.
-app.add_middleware(SecurityFilterMiddleware)
 
 # ==========================================
 # [라우터 등록]
@@ -108,7 +109,6 @@ def get_user_reservations(user_id: str):
             """)
             result = conn.execute(query, {"uid": user_id}).mappings().all()
             return [dict(row) for row in result]
-
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"DB 조회 중 오류 발생: {str(e)}")
 
