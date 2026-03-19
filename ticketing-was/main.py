@@ -8,7 +8,7 @@ import time
 # [설정] DB와 Redis 연결은 database.py에서 통합 관리합니다.
 from database import engine, rd
 
-# [보안] 팀원이 작성한 커스텀 보안 미들웨어
+# [보안] 별도로 작성하신 security.py에서 미들웨어를 가져옵니다.
 from security import SecurityFilterMiddleware
 
 # [라우터]
@@ -19,7 +19,7 @@ import reservation
 app = FastAPI()
 
 # ==========================================
-# [CORS 설정] 두 분의 도메인/IP를 모두 합친 통합 리스트
+# [CORS 설정] 통합 리스트 (프론트엔드 IP/도메인)
 # ==========================================
 origins = [
     "http://www.pulseticket.ke:30007",
@@ -33,6 +33,7 @@ origins = [
     "http://10.4.0.150"
 ]
 
+# 1. CORS 미들웨어를 먼저 등록합니다. (브라우저 요청 허용)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,       
@@ -41,7 +42,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 보안 미들웨어 적용
+# 2. 보안 미들웨어를 등록합니다. (공격 패턴 차단)
+# CORS 미들웨어 다음에 위치하여 실제 API 로직 전단계에서 검사를 수행합니다.
 app.add_middleware(SecurityFilterMiddleware)
 
 # ==========================================
@@ -68,17 +70,15 @@ def db_test():
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-# ✨ 대기열 관리자 API (두 분의 코드가 동일하므로 하나로 통합)
+# ✨ 대기열 관리자 API
 @app.post("/next")
 def allow_next_users(count: int = 10): 
     try:
-        # 가장 먼저 와서 줄을 선 사람부터 정해진 인원수(count)만큼 호명
         top_users = rd.zrange("ticket_queue", 0, count - 1)
         
         if not top_users:
             return {"status": "success", "message": "현재 대기열이 텅 비어있습니다."}
         
-        # 호명된 사람들을 입장 허가 명단(allowed_users)으로 이동시키고 대기열에서 삭제
         rd.sadd("allowed_users", *top_users)
         rd.zrem("ticket_queue", *top_users)
         
@@ -90,7 +90,7 @@ def allow_next_users(count: int = 10):
     except Exception as e:
         return {"status": "error", "message": f"대기열 이동 중 오류 발생: {str(e)}"}
 
-# ✨ 예약 내역 조회 API (작성자님 코드 보존)
+# ✨ 예약 내역 조회 API
 @app.get("/api/reservations/{user_id}")
 def get_user_reservations(user_id: str):
     try:
@@ -112,7 +112,7 @@ def get_user_reservations(user_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"DB 조회 중 오류 발생: {str(e)}")
 
-# ✨ 빈 좌석 조회 API (팀원 코드 보존)
+# ✨ 빈 좌석 조회 API
 @app.get("/seats")
 def get_seats():
     try:
@@ -124,7 +124,7 @@ def get_seats():
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-# ✨ 단일 유저 조회 API (팀원 코드 보존)
+# ✨ 단일 유저 조회 API
 @app.get("/users/{user_id}")
 def get_user(user_id: str):
     try:
