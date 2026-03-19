@@ -6,7 +6,20 @@ metadata:
   namespace: default
   annotations:
     kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/ssl-redirect: "false" # IP 테스트 시 무한 리다이렉트 방지
+    nginx.ingress.kubernetes.io/enable-modsecurity: "true"
+    nginx.ingress.kubernetes.io/enable-owasp-core-rules: "true"
+    
+    # 💡 [핵심 해결책] K8s 규칙 제약을 우회하여, Nginx 단에서 무조건 HTTPS로 튕겨냄
+    nginx.ingress.kubernetes.io/server-snippet: |
+      # 1. IP로 접속하든 도메인으로 접속하든 HTTP면 무조건 HTTPS로 강제 전환 (308)
+      if ($scheme = "http") {
+          return 308 https://$host$request_uri;
+      }
+      # 2. WAF 1차 방어 (XSS, SQLi)
+      if ($request_uri ~* "(%3Cscript|<script|1=1|%27.*OR|%22.*OR|UNION.*SELECT|%2D%2D)") {
+          return 403;
+      }
+
     nginx.ingress.kubernetes.io/proxy-body-size: "10m"
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/cors-allow-origin: "http://10.4.0.203, https://10.4.0.203, https://www.pulseticket.ke, https://pulseticket.ke"
@@ -15,21 +28,12 @@ metadata:
 spec:
   ingressClassName: nginx
   tls:
-  - hosts: ["pulseticket.ke", "www.pulseticket.ke"] # 💡 에러 원인인 IP 제거 (인증서는 도메인에만 매핑)
+  - hosts: 
+    - "pulseticket.ke"
+    - "www.pulseticket.ke"
+    # (🚨 IP 주소 제거됨 - K8s 에러 방지)
     secretName: pulseticket-tls-secret
   rules:
-  # 💡 1. host 필드를 완전히 제거했습니다. (IP '10.4.0.203'으로 들어오는 요청을 모두 여기서 처리)
-  - http:
-      paths:
-      - path: /api
-        pathType: Prefix
-        backend:
-          service: { name: ticket-backend-svc, port: { number: 8000 } }
-      - path: /
-        pathType: Prefix
-        backend:
-          service: { name: ticket-frontend-svc, port: { number: 80 } }
-  # 💡 2. 기존 도메인 규칙은 유지
   - host: pulseticket.ke
     http:
       paths:
@@ -43,6 +47,17 @@ spec:
           service: { name: ticket-frontend-svc, port: { number: 80 } }
   - host: www.pulseticket.ke
     http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service: { name: ticket-backend-svc, port: { number: 8000 } }
+      - path: /
+        pathType: Prefix
+        backend:
+          service: { name: ticket-frontend-svc, port: { number: 80 } }
+  # 💡 IP 접속을 받아주는 Catch-all 규칙 (host 필드 없음)
+  - http:
       paths:
       - path: /api
         pathType: Prefix
@@ -62,6 +77,18 @@ metadata:
   namespace: default
   annotations:
     kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/enable-modsecurity: "true"
+    nginx.ingress.kubernetes.io/enable-owasp-core-rules: "true"
+    
+    # 💡 프록시도 동일하게 HTTP -> HTTPS 강제 전환
+    nginx.ingress.kubernetes.io/server-snippet: |
+      if ($scheme = "http") {
+          return 308 https://$host$request_uri;
+      }
+      if ($request_uri ~* "(%3Cscript|<script|1=1|%27.*OR|%22.*OR|UNION.*SELECT|%2D%2D)") {
+          return 403;
+      }
+    
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     nginx.ingress.kubernetes.io/upstream-vhost: "www.kopis.or.kr"
     nginx.ingress.kubernetes.io/proxy-ssl-server-name: "on"
@@ -69,16 +96,11 @@ metadata:
 spec:
   ingressClassName: nginx
   tls:
-  - hosts: ["pulseticket.ke", "www.pulseticket.ke"] # 💡 여기도 IP 제거
+  - hosts: 
+    - "pulseticket.ke"
+    - "www.pulseticket.ke"
     secretName: pulseticket-tls-secret
   rules:
-  # 💡 3. 여기도 동일하게 host 없는 Catch-All 규칙으로 /kopis-api 연결
-  - http:
-      paths:
-      - path: /kopis-api
-        pathType: Prefix
-        backend:
-          service: { name: kopis-proxy-svc, port: { number: 443 } }
   - host: pulseticket.ke
     http:
       paths:
@@ -88,6 +110,12 @@ spec:
           service: { name: kopis-proxy-svc, port: { number: 443 } }
   - host: www.pulseticket.ke
     http:
+      paths:
+      - path: /kopis-api
+        pathType: Prefix
+        backend:
+          service: { name: kopis-proxy-svc, port: { number: 443 } }
+  - http:
       paths:
       - path: /kopis-api
         pathType: Prefix
