@@ -1,53 +1,95 @@
+# [1] 내부 서비스용 (HTTP 통신)
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: final-unified-ingress
+  name: internal-http-ingress
   namespace: default
   annotations:
     kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false" # IP 테스트 시 무한 리다이렉트 방지
     nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "http://10.4.0.203, https://10.4.0.203, https://www.pulseticket.ke, https://pulseticket.ke"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, PUT, POST, DELETE, PATCH, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts: ["pulseticket.ke", "www.pulseticket.ke"] # 💡 에러 원인인 IP 제거 (인증서는 도메인에만 매핑)
+    secretName: pulseticket-tls-secret
+  rules:
+  # 💡 1. host 필드를 완전히 제거했습니다. (IP '10.4.0.203'으로 들어오는 요청을 모두 여기서 처리)
+  - http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service: { name: ticket-backend-svc, port: { number: 8000 } }
+      - path: /
+        pathType: Prefix
+        backend:
+          service: { name: ticket-frontend-svc, port: { number: 80 } }
+  # 💡 2. 기존 도메인 규칙은 유지
+  - host: pulseticket.ke
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service: { name: ticket-backend-svc, port: { number: 8000 } }
+      - path: /
+        pathType: Prefix
+        backend:
+          service: { name: ticket-frontend-svc, port: { number: 80 } }
+  - host: www.pulseticket.ke
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service: { name: ticket-backend-svc, port: { number: 8000 } }
+      - path: /
+        pathType: Prefix
+        backend:
+          service: { name: ticket-frontend-svc, port: { number: 80 } }
+
+---
+# [2] 외부 KOPIS API 프록시용 (HTTPS 통신)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kopis-api-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/upstream-vhost: "www.kopis.or.kr"
     nginx.ingress.kubernetes.io/proxy-ssl-server-name: "on"
     nginx.ingress.kubernetes.io/proxy-ssl-name: "www.kopis.or.kr"
 spec:
   ingressClassName: nginx
   tls:
-  - hosts:
-    - pulseticket.ke
-    - www.pulseticket.ke
+  - hosts: ["pulseticket.ke", "www.pulseticket.ke"] # 💡 여기도 IP 제거
     secretName: pulseticket-tls-secret
   rules:
+  # 💡 3. 여기도 동일하게 host 없는 Catch-All 규칙으로 /kopis-api 연결
+  - http:
+      paths:
+      - path: /kopis-api
+        pathType: Prefix
+        backend:
+          service: { name: kopis-proxy-svc, port: { number: 443 } }
   - host: pulseticket.ke
     http:
       paths:
       - path: /kopis-api
         pathType: Prefix
         backend:
-          service:
-            name: kopis-proxy-svc
-            port:
-              number: 443
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: ticket-frontend-svc
-            port:
-              number: 80
+          service: { name: kopis-proxy-svc, port: { number: 443 } }
   - host: www.pulseticket.ke
     http:
       paths:
       - path: /kopis-api
         pathType: Prefix
         backend:
-          service:
-            name: kopis-proxy-svc
-            port:
-              number: 443
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: ticket-frontend-svc
-            port:
-              number: 80
+          service: { name: kopis-proxy-svc, port: { number: 443 } }
