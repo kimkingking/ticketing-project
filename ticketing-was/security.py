@@ -1,49 +1,34 @@
 import re
-import html
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import Request
+from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.responses import JSONResponse # 에러 응답용 추가
-
-app = FastAPI()
 
 class SecurityFilterMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
+        # 1. 강화된 SQL 인젝션 패턴 (공백 우회 및 핵심 키워드 추가)
         danger_pattern = re.compile(
-            r"(\'|--|#|;|\b(SELECT|INSERT|UPDATE|DELETE|DROP|UNION|AND|OR|EXEC)\b|<script.*?>)", 
+            r"(\'|--|#|;|\b(SELECT|INSERT|UPDATE|DELETE|DROP|UNION|AND|OR|EXEC|INFORMATION_SCHEMA)\b|<script.*?>)",
             re.IGNORECASE
         )
 
-        # 1. URL 파라미터 검사
+        # [검사 1] URL 파라미터 검사
         query_params = str(request.query_params)
         if danger_pattern.search(query_params):
-            return JSONResponse(status_code=403, content={"detail": "Security Threat Detected (URL)"})
+            return JSONResponse(status_code=403, content={"detail": "WAF: SQL Injection Attempt Detected in URL"})
 
-        # 2. 본문 데이터 검사 (POST/PUT)
-        if request.method in ["POST", "PUT"]:
-            # 핵심: body를 읽을 때 에러가 나지 않도록 처리
+        # [검사 2] 본문(Body) 데이터 검사 (POST, PUT 등)
+        if request.method in ["POST", "PUT", "PATCH"]:
             body = await request.body()
             body_str = body.decode(errors='ignore')
+            
             if danger_pattern.search(body_str):
-                # HTTPException 대신 직접 JSONResponse를 던지는 것이 미들웨어에서 더 안전합니다.
-                return JSONResponse(status_code=403, content={"detail": "Security Threat Detected (Body)"})
+                return JSONResponse(status_code=403, content={"detail": "WAF: SQL Injection Attempt Detected in Body"})
 
-        # 검사를 통과하면 다음 단계로 진행
+            # ★ 중요: 읽은 본문을 백엔드 로직에서도 쓸 수 있게 다시 채워줌 (핵심 해결책)
+            async def receive():
+                return {"type": "http.request", "body": body}
+            request._receive = receive
+
+        # 통과 시 다음 단계로 진행
         response = await call_next(request)
         return response
-
-app.add_middleware(SecurityFilterMiddleware)
-
-# 루트 경로 설정 (GET, POST 모두 허용)
-@app.api_route("/", methods=["GET", "POST"])
-async def root():
-    return {"message": "Safe Ticketing System"}
-
-# 미들웨어 내부 로직에 추가
-async def dispatch(self, request, call_next):
-    # 1. URL 뒤에 붙은 파라미터(query=DELETE 등) 검사
-    query_params = str(request.query_params)
-    if "DELETE" in query_params.upper() or "DROP" in query_params.upper():
-        return JSONResponse(status_code=403, content={"detail": "Security Threat Detected!"})
-
-    response = await call_next(request)
-    return response
