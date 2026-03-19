@@ -15,8 +15,8 @@ metadata:
       SecAuditLogType Serial
 
     # [2. 님의 DDoS 방어 설정]
-    nginx.ingress.kubernetes.io/limit-rps: "50"
-    nginx.ingress.kubernetes.io/limit-connections: "20"
+    nginx.ingress.kubernetes.io/limit-rps: "5"           # 초당 5번만 허용 (테스트용으로 직빵)
+    nginx.ingress.kubernetes.io/limit-connections: "3"    # 동시에 3개 연결만 허용
 
     # [3. 팀원 파일에 있던 기존 설정들]
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
