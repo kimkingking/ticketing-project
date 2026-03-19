@@ -1,17 +1,12 @@
 from fastapi import APIRouter, Form, Response
-from sqlalchemy import create_engine, text
+from sqlalchemy import text
+from database import engine # 💡 통합된 DB 엔진 사용
 
-# 1. 라우터 설정 (main.py에서 /api/member로 연결됨)
 router = APIRouter(prefix="/api/member")
 
-# 2. DB 연결 설정
-DB_URL = "mysql+pymysql://mysql:1234@mysql:3306/ticket"
-engine = create_engine(DB_URL)
-
 @router.post("/login")
-async def login(
+def login(  # 💡 동기 DB 통신을 위해 async 제거
     response: Response,
-    # 프론트엔드의 FormData('u_id', 'u_pass')와 정확히 1:1로 매칭됩니다.
     u_id: str = Form(...),
     u_pass: str = Form(...)
 ):
@@ -22,14 +17,10 @@ async def login(
                 FROM user
                 WHERE user_id = :u_id AND password = :u_pass
             """)
-
-            # 받아온 변수 u_id, u_pass를 쿼리에 바인딩합니다.
             result = conn.execute(query, {"u_id": u_id, "u_pass": u_pass}).fetchone()
 
             if result:
-                # 결과값 언패킹
                 user_id, user_name, email = result
-
                 return {
                     "status": "success",
                     "message": f"{user_name}님, 환영합니다!",
