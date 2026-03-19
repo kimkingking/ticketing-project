@@ -4,25 +4,23 @@ metadata:
   name: pulseticket-api-ingress
   namespace: default
   annotations:
-    # 기존 인증서/SSL 설정은 그대로 유지 ✅
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP" # Kong까지는 HTTP로 전송
     nginx.ingress.kubernetes.io/rewrite-target: /$2
-    # 콩(Kong)에게 진짜 유저 정보를 배달하는 필수 코드! 🚚
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_set_header X-Real-IP $remote_addr;
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 spec:
   ingressClassName: nginx
-  tls:
-  - hosts:
-    - pulseticket.ke
-    - www.pulseticket.ke
-    secretName: pulseticket-tls-secret # 찐 인증서 유지 ✅
+  # IP로 접속할 땐 도메인 인증서가 필요 없으니 잠시 꺼둡니다! ✅
+  # tls:
+  # - hosts:
+  #   - pulseticket.ke
+  #   - www.pulseticket.ke
+  #   secretName: pulseticket-tls-secret 
   rules:
-  - host: www.pulseticket.ke
-    http:
+  - http: # <--- 기존의 '- host: www.pulseticket.ke' 명찰 검사를 아예 날려버렸습니다! 🎯
       paths:
-      - path: /kopis-api(/|$)(.*)
+      - path: /(/|$)(.*)
         pathType: ImplementationSpecific
         backend:
           service:
