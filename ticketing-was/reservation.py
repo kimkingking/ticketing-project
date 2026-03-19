@@ -15,25 +15,25 @@ router = APIRouter()
 # ==========================================
 # [데이터 모델]
 # ==========================================
-# [1. detail.js 용] 대기열 확인용 (422 방지를 위해 token 기본값 설정)
+# [1. detail.js 용] 대기열 확인용
 class PreCheckRequest(BaseModel):
     user_id: str
     perf_id: str
     select_date: str
     select_time: str
-    turnstile_token: str = "" # 프론트에서 안 보내도 에러 안 나게 처리
+    turnstile_token: str = "" 
 
 # [2. 최종 예매용] DB 좌석 저장 및 캡차 검증용
 class ReservationRequest(BaseModel):
     user_id: str
-    seat_num: str       # 💡 프론트에서 넘어오는 "S1" 형태 그대로 사용
+    seat_num: str       
     perf_id: str
     perf_title: str
     select_date: str
     select_time: str
     place: str
     price: int
-    turnstile_token: str = "" # 에러 방지용 기본값 추가
+    turnstile_token: str = "" 
 
 # ==========================================
 # [보조 함수] 캡차 검증
@@ -49,6 +49,35 @@ def verify_turnstile_sync(token: str) -> bool:
         return response.json().get("success", False)
     except Exception as e:
         return False
+
+# ==========================================
+# 💡 [새로 추가된 API] 예약된 좌석 목록 조회
+# 프론트엔드에서 회색 좌석을 표시하기 위해 호출합니다.
+# ==========================================
+@router.get("/seats")
+def get_reserved_seats(perf_id: str, date: str, time: str):
+    try:
+        with engine.connect() as conn:
+            # 해당 공연, 날짜, 시간에 'OCCUPIED' 상태인 좌석 번호만 가져옵니다.
+            query = text("""
+                SELECT seat_num FROM seat 
+                WHERE perf_id = :perf_id 
+                  AND perf_date = :date 
+                  AND perf_time = :time 
+                  AND status = 'OCCUPIED'
+            """)
+            result = conn.execute(query, {
+                "perf_id": perf_id,
+                "date": date,
+                "time": time
+            }).fetchall()
+            
+            # 조회된 데이터 [('S1',), ('S2',)] 형태를 ['S1', 'S2'] 리스트로 예쁘게 변환
+            reserved_seats = [row[0] for row in result if row[0]]
+            
+            return {"status": "success", "reserved_seats": reserved_seats}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
 
 # ==========================================
 # [API 1] 사전 진입 검증 (상세페이지 - 대기열만 체크)
@@ -78,7 +107,7 @@ def reserve_precheck(req: PreCheckRequest):
 @router.post("/confirm")
 def confirm_reservation(req: ReservationRequest):
     try:
-        # 1. 캡차 검증 (테스트 모드일 땐 패스)
+        # 1. 캡차 검증
         is_test_mode = (DEBUG_MODE and req.turnstile_token in ["", "JETER_TEST_TOKEN"])
         if not is_test_mode:
             if not verify_turnstile_sync(req.turnstile_token):
@@ -112,7 +141,7 @@ def confirm_reservation(req: ReservationRequest):
                         text("UPDATE seat SET status = 'OCCUPIED' WHERE seat_id = :id"),
                         {"id": real_seat_id}
                     )
-                # 3-2. DB에 좌석 데이터가 아예 없을 때 (지수님의 천재적인 로직!)
+                # 3-2. DB에 좌석 데이터가 아예 없을 때
                 else:
                     result = conn.execute(text("""
                         INSERT INTO seat (seat_num, perf_id, perf_date, perf_time, status, version)
@@ -121,9 +150,9 @@ def confirm_reservation(req: ReservationRequest):
                         "seat_num": req.seat_num, "perf_id": req.perf_id,
                         "date": req.select_date, "time": req.select_time
                     })
-                    real_seat_id = result.lastrowid # 방금 만들어진 진짜 아이디
+                    real_seat_id = result.lastrowid
 
-                # 4. 예약 정보 삽입 (확보한 진짜 seat_id를 씁니다)
+                # 4. 예약 정보 삽입
                 conn.execute(text("""
                     INSERT INTO reservation (user_id, seat_id, seat_num, perf_id, perf_title, select_date, select_time, place, price)
                     VALUES (:user_id, :seat_id, :seat_num, :perf_id, :perf_title, :select_date, :select_time, :place, :price)
@@ -133,7 +162,8 @@ def confirm_reservation(req: ReservationRequest):
                     "select_date": req.select_date, "select_time": req.select_time,
                     "place": req.place, "price": req.price
                 })
-        # 예매 성공 후 대기열 허가 명단에서 깔끔하게 제거
+                
+        # 예매 성공 후 대기열 허가 명단에서 제거
         rd.srem("allowed_users", req.user_id)
         return {"status": "success", "message": "🎉 예매 성공! 즐거운 관람 되세요!"}
 
