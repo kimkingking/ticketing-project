@@ -125,15 +125,14 @@ def confirm_reservation(req: ReservationRequest):
 
                 # 4. 예약 정보 삽입 (확보한 진짜 seat_id를 씁니다)
                 conn.execute(text("""
-                    INSERT INTO reservation (user_id, seat_id, perf_id, perf_title, select_date, select_time, place, price)
-                    VALUES (:user_id, :seat_id, :perf_id, :perf_title, :select_date, :select_time, :place, :price)
+                    INSERT INTO reservation (user_id, seat_id, seat_num, perf_id, perf_title, select_date, select_time, place, price)
+                    VALUES (:user_id, :seat_id, :seat_num, :perf_id, :perf_title, :select_date, :select_time, :place, :price)
                 """), {
-                    "user_id": req.user_id, "seat_id": real_seat_id,
+                    "user_id": req.user_id, "seat_id": real_seat_id, "seat_num": req.seat_num,
                     "perf_id": req.perf_id, "perf_title": req.perf_title,
                     "select_date": req.select_date, "select_time": req.select_time,
                     "place": req.place, "price": req.price
                 })
-
         # 예매 성공 후 대기열 허가 명단에서 깔끔하게 제거
         rd.srem("allowed_users", req.user_id)
         return {"status": "success", "message": "🎉 예매 성공! 즐거운 관람 되세요!"}
