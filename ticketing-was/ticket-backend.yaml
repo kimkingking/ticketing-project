@@ -27,6 +27,13 @@ spec:
               key: turnstile-key
         ports:
         - containerPort: 8000 # 파이썬 서버 포트
+        resources:
+          requests:
+            cpu: "100m"      # HPA 계산을 위한 기준점 (꼭 필요!)
+            memory: "128Mi"
+          limits:
+            cpu: "500m"      # 최대 사용량 제한
+            memory: "256Mi"           
 ---
 apiVersion: v1
 kind: Service
