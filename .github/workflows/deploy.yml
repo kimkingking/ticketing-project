@@ -17,27 +17,28 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Build and push WAS image
+    - name: Build and push Backend Image (Bohye's Work)
       run: |
+        # 보혜님의 백엔드만 빌드해서 올립니다.
         docker build -t kingking4105/ticketing-was:latest ./ticketing-was
         docker push kingking4105/ticketing-was:latest
 
-    - name: Deploy to K8s
+    - name: Deploy and Refresh K8s
       run: |
         mkdir -p ~/.kube
         echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
 
-        # 1. 아까 확인한 실제 파일 경로로 적용
+        # 1. 최신 설정 파일 적용 (백엔드/프론트엔드)
         kubectl apply -f ./ticketing-was/ticket-backend.yaml
         kubectl apply -f ./web/ticket-frontend.yaml
 
-        # 2. 핵심 수정: 컨테이너 이름을 'nginx-frontend'로 변경!
-        # Always 정책은 이미 yaml에 넣으셨으니 restart만 확실히 해줍니다.
-        kubectl set image deployment/ticket-frontend-deploy nginx-frontend=leeseonghoon234/ticket-web:latest
-
-        # 3. 재시작 및 상태 확인
+        # 2. 💡 프론트엔드 최신 이미지 강제 반영 (성훈님 작업물 땡겨오기)
+        # imagePullPolicy: Always 덕분에 재시작 시 최신 이미지를 새로 받아옵니다.
         kubectl rollout restart deployment/ticket-frontend-deploy
-        kubectl rollout restart deployment/ticket-backend-deploy
         
+        # 3. 백엔드도 함께 재시작 (보혜님 작업물 반영)
+        kubectl rollout restart deployment/ticket-backend-deploy
+
+        # 완료 대기
         kubectl rollout status deployment/ticket-frontend-deploy
         kubectl rollout status deployment/ticket-backend-deploy
