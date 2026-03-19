@@ -6,8 +6,10 @@ from starlette.middleware.base import BaseHTTPMiddleware
 class SecurityFilterMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # 💡 '--' 뒤에 공백이 올 때만 잡도록 수정 (--\s) -> 폼 데이터 경계선 통과!
+        # OR와 AND를 제외하여 더 유연하게 만든 버전
         danger_pattern = re.compile(
-            r"(\'|--\s|#|;|\b(SELECT|INSERT|UPDATE|DELETE|DROP|UNION|AND|OR|EXEC|INFORMATION_SCHEMA)\b|<script.*?>)",
+            # 💡 '-- ', '# ', '; ' 처럼 뒤에 공백이 붙는 공격 패턴과 핵심 SQL 명령어만 차단
+            r"(--\s|#\s|;\s|\b(SELECT|INSERT|UPDATE|DELETE|DROP|UNION|EXEC|INFORMATION_SCHEMA)\b|<script.*?>)",
             re.IGNORECASE
         )
 
