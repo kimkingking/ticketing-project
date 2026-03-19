@@ -4,14 +4,18 @@ import requests
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import text
-from database import engine, rd
+from database import engine, rd #
 
+# [설정] 환경변수 및 캡차 키
 DEBUG_MODE = os.getenv("DEBUG_MODE", "False") == "True"
 TURNSTILE_SECRET_KEY = os.getenv("TURNSTILE_SECRET_KEY", "0x4AAAAAACon_-jaaYDj9s5-")
 
 router = APIRouter()
 
-# [1. detail.js 용] 대기열 & 캡차 사전 검증만 수행
+# ==========================================
+# [데이터 모델]
+# ==========================================
+# [1. detail.js 용] 대기열 & 캡차 사전 검증용
 class PreCheckRequest(BaseModel):
     user_id: str
     perf_id: str
@@ -19,7 +23,7 @@ class PreCheckRequest(BaseModel):
     select_time: str
     turnstile_token: str
 
-# [2. 최종 예매용] DB 좌석 저장까지 수행
+# [2. 최종 예매용] DB 좌석 저장용
 class ReservationRequest(BaseModel):
     user_id: str
     seat_id: int        
@@ -31,6 +35,9 @@ class ReservationRequest(BaseModel):
     price: int
     turnstile_token: str
 
+# ==========================================
+# [보조 함수] 캡차 검증
+# ==========================================
 def verify_turnstile_sync(token: str) -> bool:
     if not TURNSTILE_SECRET_KEY or not token: return False
     try:
@@ -43,7 +50,9 @@ def verify_turnstile_sync(token: str) -> bool:
     except Exception as e:
         return False
 
-# --- [API 1] 사전 진입 검증 (detail.js 에서 찌르는 곳) ---
+# ==========================================
+# [API 1] 사전 진입 검증 (대기열 보호 로직 적용)
+# ==========================================
 @router.post("/reserve")
 def reserve_precheck(req: PreCheckRequest):
     try:
@@ -51,7 +60,10 @@ def reserve_precheck(req: PreCheckRequest):
         is_allowed = rd.sismember("allowed_users", req.user_id)
         if not is_allowed:
             now = time.time()
-            rd.zadd("ticket_queue", {req.user_id: now})
+            # 💡 [중요 수정] nx=True를 추가하여 이미 대기열에 있는 경우 기존 시간을 유지합니다.
+            rd.zadd("ticket_queue", {req.user_id: now}, nx=True)
+            
+            # 내 순위 계산
             rank = rd.zrank("ticket_queue", req.user_id) + 1
             return {"status": "wait", "message": "아직 예매 순서가 아닙니다.", "waiting_number": rank}
 
@@ -61,7 +73,7 @@ def reserve_precheck(req: PreCheckRequest):
             if not verify_turnstile_sync(req.turnstile_token):
                 raise HTTPException(status_code=403, detail="캡차 검증이 필요합니다.")
 
-        # 성공 시 DB 작업 없이 통과 (좌석 선택 페이지로 넘어가기 위함)
+        # 성공 시 DB 작업 없이 통과
         return {"status": "success", "message": "검증 완료. 좌석 선택으로 이동합니다."}
 
     except HTTPException as he:
@@ -69,24 +81,28 @@ def reserve_precheck(req: PreCheckRequest):
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-# --- [API 2] 최종 예매 진행 (좌석 선택 페이지에서 찌르는 곳) ---
+# ==========================================
+# [API 2] 최종 예매 진행 (DB 저장)
+# ==========================================
 @router.post("/confirm")
 def confirm_reservation(req: ReservationRequest):
     try:
         with engine.connect() as conn:
             with conn.begin():
-                # 좌석 락 및 상태 확인 (팀원분 로직 그대로 유지)
+                # 좌석 락 및 상태 확인
                 query = text("SELECT status FROM seat WHERE seat_id = :id FOR UPDATE")
                 seat = conn.execute(query, {"id": req.seat_id}).fetchone()
 
                 if not seat or seat[0] != 'AVAILABLE':
                     return {"status": "fail", "message": "이미 예약이 완료된 좌석입니다."}
 
+                # 좌석 상태 업데이트
                 conn.execute(
                     text("UPDATE seat SET status = 'OCCUPIED' WHERE seat_id = :id"),
                     {"id": req.seat_id}
                 )
 
+                # 예약 정보 삽입
                 conn.execute(text("""
                     INSERT INTO reservation (user_id, seat_id, perf_id, perf_title, select_date, select_time, place, price)
                     VALUES (:user_id, :seat_id, :perf_id, :perf_title, :select_date, :select_time, :place, :price)
@@ -97,6 +113,7 @@ def confirm_reservation(req: ReservationRequest):
                     "place": req.place, "price": req.price
                 })
 
+        # 예매 성공 후 허가 명단에서 제거
         rd.srem("allowed_users", req.user_id)
         return {"status": "success", "message": "🎉 예매 성공! 즐거운 관람 되세요!"}
 
