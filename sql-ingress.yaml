@@ -1,12 +1,12 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: internal-http-ingress  # 💡 중요: 팀원 파일 이름과 똑같이 맞춰야 에러가 안 남!
+  name: internal-http-ingress  
   namespace: default
   annotations:
     kubernetes.io/ingress.class: nginx
-    
-    # [1. 님의 WAF 보안 설정]
+
+    # [1. WAF 보안 설정]
     nginx.ingress.kubernetes.io/enable-modsecurity: "true"
     nginx.ingress.kubernetes.io/enable-owasp-core-rules: "true"
     nginx.ingress.kubernetes.io/modsecurity-snippet: |
@@ -14,11 +14,16 @@ metadata:
       SecAuditLog /dev/stdout
       SecAuditLogType Serial
 
-    # [2. 님의 DDoS 방어 설정]
-    nginx.ingress.kubernetes.io/limit-rps: "5"           # 초당 5번만 허용 (테스트용으로 직빵)
-    nginx.ingress.kubernetes.io/limit-connections: "3"    # 동시에 3개 연결만 허용
+      # 💡 [핵심 추가] URL이나 파라미터에 스크립트(<script>)나 SQL 공격(1=1) 패턴이 보이면
+      # OWASP 벌점 확인 전에 가장 먼저(phase:1) 403 에러로 즉시 차단하는 강력한 커스텀 룰!
+      SecRule REQUEST_URI|ARGS "@rx (?i)(<script|1=1|or.*=.*|union.*select)" \
+        "id:100001,phase:1,deny,status:403,log,msg:'Strict WAF Block: XSS or SQLi Detected'"
 
-    # [3. 팀원 파일에 있던 기존 설정들]
+    # [2. DDoS 방어 설정 (현재 테스트를 위해 주석 처리 추천)]
+    # nginx.ingress.kubernetes.io/limit-rps: "5"           
+    # nginx.ingress.kubernetes.io/limit-connections: "3"    
+
+    # [3. 기존 설정들]
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
     nginx.ingress.kubernetes.io/proxy-body-size: "10m"
     nginx.ingress.kubernetes.io/enable-cors: "true"
@@ -26,7 +31,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - http: # IP 접속용 (10.4.0.203)
+  - http: 
       paths:
       - path: /api
         pathType: Prefix
