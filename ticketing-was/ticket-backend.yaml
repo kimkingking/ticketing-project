@@ -15,7 +15,7 @@ spec:
       containers:
       - name: python-backend
         # 💡 새로 만든 1.06 버전 명시 (경로 문제가 해결된 버전)
-        image: leeseonghoon234/ticket-was:latest
+        image: kingking4105/ticketing-was:latest
         imagePullPolicy: Always
         env:
         - name: DB_HOST
