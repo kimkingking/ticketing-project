@@ -1,7 +1,8 @@
 import re
+import bcrypt  # 💡 암호화 라이브러리 추가
 from fastapi import APIRouter, Form
 from sqlalchemy import text
-from database import engine # 💡 통합된 DB 엔진 사용
+from database import engine
 
 router = APIRouter(prefix="/api/member")
 
@@ -14,7 +15,7 @@ def format_phone_number(phone: str) -> str:
     return phone
 
 @router.post("/register")
-def register(  # 💡 동기 DB 통신을 위해 async 제거
+def register(
     user_id: str = Form(...),
     password: str = Form(...),
     user_name: str = Form(...),
@@ -24,6 +25,13 @@ def register(  # 💡 동기 DB 통신을 위해 async 제거
 ):
     try:
         formatted_phone = format_phone_number(phone)
+        
+        # 💡 비밀번호 해싱 처리 (평문 비밀번호를 암호화)
+        # 1. 비밀번호를 바이트 문자열로 인코딩
+        # 2. 임의의 Salt를 생성하여 해싱
+        # 3. DB 저장을 위해 다시 일반 문자열(utf-8)로 디코딩
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
         with engine.connect() as conn:
             check_sql = text("SELECT user_id FROM user WHERE user_id = :user_id")
             existing = conn.execute(check_sql, {"user_id": user_id}).fetchone()
@@ -38,7 +46,7 @@ def register(  # 💡 동기 DB 통신을 위해 async 제거
             
             conn.execute(insert_sql, {
                 "user_id": user_id, 
-                "password": password, 
+                "password": hashed_password,  # 💡 평문 password 대신 암호화된 변수 삽입
                 "user_name": user_name, 
                 "phone": formatted_phone,
                 "addr": addr, 
