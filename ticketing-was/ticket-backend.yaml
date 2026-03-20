@@ -30,10 +30,10 @@ spec:
         resources:
           requests:
             cpu: "100m"      # HPA가 계산할 때 쓰는 기준점! (이게 범인이었음)
-            memory: "128Mi"
+            memory: "200Mi"
           limits:
             cpu: "500m"      # 최대 이만큼까지만 쓰게 제한
-            memory: "256Mi"
+            memory: "600Mi"
 ---
 apiVersion: v1
 kind: Service
