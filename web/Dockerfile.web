@@ -5,9 +5,9 @@ FROM nginx:alpine
 RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# 기존 웹 파일 삭제 및 복사
+# 기존 웹 파일 삭제 및 복사 (💡 경로를 ./WEB/ 으로 수정)
 RUN rm -rf /usr/share/nginx/html/*
-COPY ./NfsWebFile-main /usr/share/nginx/html/
+COPY ./WEB/ /usr/share/nginx/html/
 RUN chmod -R 755 /usr/share/nginx/html
 
 EXPOSE 80
