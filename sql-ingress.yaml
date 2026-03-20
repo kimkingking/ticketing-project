@@ -5,15 +5,12 @@ metadata:
   namespace: default
   annotations:
     kubernetes.io/ingress.class: nginx
-    
-    # [기본 WAF 켜두기]
     nginx.ingress.kubernetes.io/enable-modsecurity: "true"
     nginx.ingress.kubernetes.io/enable-owasp-core-rules: "true"
 
-    # 💡 [진짜 무조건 막히는 입구컷 설정]
-    # URL에 악성 패턴이 보이면 ModSecurity를 거치기도 전에 Nginx가 403 에러 페이지를 냅다 던집니다. (사진과 똑같이 나옵니다!)
+    # URL 인코딩 공격까지 원천 차단하는 최종 정규식
     nginx.ingress.kubernetes.io/server-snippet: |
-      if ($request_uri ~* "(%3Cscript|<script|1=1|%27%20OR|' OR|UNION.*SELECT)") {
+      if ($request_uri ~* "(%3Cscript|<script|1=1|%27.*OR|%22.*OR|UNION.*SELECT|%2D%2D)") {
           return 403;
       }
 
