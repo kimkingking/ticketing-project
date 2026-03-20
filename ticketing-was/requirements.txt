@@ -11,4 +11,3 @@ pydantic
 python-multipart
 cryptography
 bcrypt
-
