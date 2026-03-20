@@ -33,7 +33,7 @@ jobs:
     - name: Build and push Frontend Image (Seonghoon's Work)
       run: |
         # L 부분에 성훈님의 실제 도커 아이디를 적어주세요.
-        docker build -t leeseonghoon234/ticket-web:latest ./web
+        docker build -f ./web/Dockerfile.web -t leeseonghoon234/ticket-web:latest ./web
         docker push leeseonghoon234/ticket-web:latest
 
 
