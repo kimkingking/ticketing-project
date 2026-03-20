@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>회원가입</title>
+    <link rel="stylesheet" href="./css/signin.css" />
+  </head>
+  <body>
+
+    <div class="signup-container">
+        <h2>회원가입</h2>
+
+        <form id="signupForm">
+            <div class="input-group">
+                <input type="text" id="userId" placeholder="아이디 (영문, 숫자 포함 5자 이상)" required>
+                <span id="idMsg" class="msg"></span> </div>
+
+            <div class="input-group">
+                <input type="password" id="password" placeholder="비밀번호 (영문/숫자/특수문자 8자 이상)" required>
+                <span id="pwMsg" class="msg"></span> </div>
+
+            <div class="input-group">
+                <input type="password" id="passwordConfirm" placeholder="비밀번호 재확인" required>
+                <span id="confirmMsg" class="msg"></span> </div>
+
+            <div class="input-group">
+                <input type="text" id="userName" placeholder="이름" required>
+            </div>
+
+            <div class="input-group">
+                <input type="text" id="userAddress" placeholder="주소" required>
+            </div>
+
+            <div class="input-group">
+                <input type="email" id="userEmail" placeholder="이메일 (example@company.com)" required>
+                <span id="emailMsg" class="msg"></span> </div>
+
+            <div class="input-group">
+                <input type="tel" id="userPhone" placeholder="전화번호 (숫자만 입력)" maxlength="11" required>
+            </div>
+
+            <button type="submit" id="submitBtn" class="signup-btn" disabled>가입하기</button>
+        </form>
+
+        <div class="footer-links">
+            <a href="./login.html">이미 계정이 있으신가요? <strong>로그인</strong></a>
+        </div>
+    </div>
+    
+    <script src="./js/signin.js"></script>
+  </body>
+</html>

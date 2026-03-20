@@ -1,0 +1,47 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+body {
+    font-family: 'Pretendard', sans-serif;
+    background-color: #fcfcfd;
+    color: #333333;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+/* 스크롤바 숨김 */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* 부드러운 호버 스케일 효과 */
+.hover-scale { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+.hover-scale:hover { transform: translateY(-4px); }
+
+/* 말줄임표 처리 */
+.truncate-1-lines { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.truncate-2-lines { 
+    display: -webkit-box; 
+    -webkit-line-clamp: 2; 
+    -webkit-box-orient: vertical; 
+    overflow: hidden; 
+}
+
+/* 로더 애니메이션 */
+.pastel-loader {
+    width: 60px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 8px solid #f3e8ff;
+    border-right-color: #c084fc; 
+    animation: l2 1s infinite linear;
+}
+@keyframes l2 { to { transform: rotate(1turn) } }
+
+/* 날짜 입력 폼 스타일 */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+    transition: 0.2s;
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}

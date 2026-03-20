@@ -8,7 +8,7 @@ print("🚀 대기열 자동 펌프 가동 시작 (방식: 컨테이너 내부 P
 cmd = [
     "kubectl", "exec", "deploy/ticket-backend-deploy", "--",
     "python", "-c",
-    "import urllib.request; req=urllib.request.Request('http://127.0.0.1:8000/next?count=10', method='POST'); print(urllib.request.urlopen(req).read().decode())"
+    "import urllib.request; req=urllib.request.Request('http://127.0.0.1:8000/next?count=5', method='POST'); print(urllib.request.urlopen(req).read().decode())"
 ]
 
 while True:

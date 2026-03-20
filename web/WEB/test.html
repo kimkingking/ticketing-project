@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>통합 티켓팅 테스트</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px; line-height: 1.6; }
+        .box { border: 1px solid #ccc; padding: 20px; border-radius: 10px; max-width: 500px; margin: 0 auto; }
+        #reserve-btn { padding: 15px 30px; font-size: 18px; cursor: pointer; background: #28a745; color: white; border: none; border-radius: 5px; }
+        #reserve-btn:disabled { background: #ccc; cursor: not-allowed; }
+        #status-message { margin: 20px 0; font-weight: bold; }
+        
+        /* 🚨 캡차 팝업 스타일 (평소엔 숨김) */
+        #captcha-modal {
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: white; border: 3px solid red; padding: 30px; z-index: 1000; box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; }
+    </style>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body>
+
+    <div class="box">
+        <h2>🎸 초특급 콘서트 예매 🎸</h2>
+        <p>좌석번호: <b>A-12 (포도알 🍇)</b></p>
+        
+        <div id="status-message">아래 버튼을 눌러 예매를 시작하세요.</div>
+        <button id="reserve-btn" onclick="handleTicketing()">🎟️ 좌석 예매하기</button>
+    </div>
+
+    <div id="overlay"></div>
+    <div id="captcha-modal">
+        <h3 style="color: red;">🤖 매크로 의심 동작 감지!</h3>
+        <p>사람임을 증명해야 예매를 완료할 수 있습니다.</p>
+        <div class="captcha-container" style="display: flex; justify-content: center; margin-bottom: 15px;">
+            <div class="cf-turnstile" data-sitekey="0x4AAAAAACon_-jaaYDj9s5-"></div>
+        </div>
+        <button onclick="retryWithCaptcha()" style="padding: 10px 20px;">인증 완료 및 다시 예매</button>
+    </div>
+
+    <script>
+        // 🚨 본인의 백엔드 주소로 변경!
+        const BACKEND_URL = "http://10.4.0.203/api/reservations/reserve";
+        
+        // 유저 정보 (한 번 생성하면 대기열 끝날 때까지 유지)
+        let requestData = {
+            user_id: "user_" + Math.floor(Math.random() * 10000),
+            seat_id: 12,
+            perf_id: "CONCERT_001",
+            perf_title: "지수콘서트",
+            select_date: "2026-12-25",
+            select_time: "20:00",
+            place: "체조경기장",
+            price: 150000,
+            turnstile_token: "" // 처음엔 빈 토큰으로 쏩니다!
+        };
+
+        // 1. [예매하기] 버튼 클릭 시 호출
+        function handleTicketing() {
+            document.getElementById("reserve-btn").disabled = true;
+            sendRequest();
+        }
+
+        // 2. 서버와 통신하는 핵심 함수
+        async function sendRequest() {
+            const statusMsg = document.getElementById("status-message");
+            
+            try {
+                const response = await fetch(BACKEND_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(requestData)
+                });
+
+                // 👉 시나리오 1: 매크로 의심 (403 Forbidden)
+                if (response.status === 403) {
+                    showCaptchaModal(); // 캡차 팝업 띄우기
+                    return;
+                }
+
+                const result = await response.json();
+
+                // 👉 시나리오 2: 대기열 발생 (status: wait)
+                if (result.status === "wait") {
+                    statusMsg.innerText = `⏳ 대기 중... (내 순서: ${result.waiting_number}번)`;
+                    statusMsg.style.color = "orange";
+                    
+                    // 3초 뒤 다시 찌르기 (Polling)
+                    setTimeout(sendRequest, 3000);
+                } 
+                // 👉 시나리오 3: 예매 성공!
+                else if (result.status === "success") {
+                    statusMsg.innerText = "🎉 예매 성공! 즐거운 관람 되세요!";
+                    statusMsg.style.color = "green";
+                    hideCaptchaModal();
+                }
+                // 👉 시나리오 4: 기타 실패 (이미 팔린 좌석 등)
+                else {
+                    statusMsg.innerText = "❌ 실패: " + (result.message || result.detail);
+                    statusMsg.style.color = "red";
+                    document.getElementById("reserve-btn").disabled = false;
+                }
+
+            } catch (error) {
+                statusMsg.innerText = "⚠️ 서버 연결 에러! (CORS나 서버 상태 확인)";
+                document.getElementById("reserve-btn").disabled = false;
+            }
+        }
+
+        // 캡차 모달 띄우기
+        function showCaptchaModal() {
+            document.getElementById("captcha-modal").style.display = "block";
+            document.getElementById("overlay").style.display = "block";
+            document.getElementById("status-message").innerText = "⚠️ 인증이 필요합니다!";
+        }
+
+        // 캡차 모달 닫기
+        function hideCaptchaModal() {
+            document.getElementById("captcha-modal").style.display = "none";
+            document.getElementById("overlay").style.display = "none";
+        }
+
+        // 3. 캡차 인증 후 다시 시도하는 함수
+        function retryWithCaptcha() {
+            const token = document.querySelector('[name="cf-turnstile-response"]').value;
+            
+            if (!token) {
+                alert("체크박스를 눌러 인증을 완료해주세요!");
+                return;
+            }
+
+            // 진짜 토큰을 데이터에 담아서 다시 발사!
+            requestData.turnstile_token = token;
+            document.getElementById("status-message").innerText = "인증 토큰과 함께 다시 시도 중...";
+            sendRequest();
+        }
+    </script>
+</body>
+</html>

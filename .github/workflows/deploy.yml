@@ -22,6 +22,20 @@ jobs:
         # 보혜님의 백엔드만 빌드해서 올립니다.
         docker build -t kingking4105/ticketing-was:latest ./ticketing-was
         docker push kingking4105/ticketing-was:latest
+    
+    - name: Login to Docker Hub (Seonghoon)
+      uses: docker/login-action@v2
+      with:
+        # 방금 깃허브 Secret에 새로 만든 이름으로 설정합니다.
+        username: ${{ secrets.DOCKER_USERNAME_SH }}
+        password: ${{ secrets.DOCKER_PASSWORD_SH }}
+
+    - name: Build and push Frontend Image (Seonghoon's Work)
+      run: |
+        # L 부분에 성훈님의 실제 도커 아이디를 적어주세요.
+        docker build -t L/ticket-web:latest ./web
+        docker push L/ticket-web:latest
+
 
     - name: Deploy and Refresh K8s
       run: |
