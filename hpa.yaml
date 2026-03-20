@@ -21,12 +21,12 @@ spec:
     scaleUp:
       stabilizationWindowSeconds: 0   # 부하 감지 시 대기 시간 없이 즉시 실행
       policies:
-      - type: Percent
-        value: 400                    # 한 번에 현재 파드 수의 400%까지 증가 허용
+      - type: Pods
+        value: 4                    # 한 번에 현재 파드 수의 400%까지 증가 허용
         periodSeconds: 15             # 15초마다 정책 재계산
     scaleDown:
-      stabilizationWindowSeconds: 300 # 부하가 줄어도 5분(300초) 동안은 유지 (갑작스러운 삭제 방지)
+      stabilizationWindowSeconds: 120
       policies:
       - type: Percent
-        value: 100                    # 줄어들 때는 천천히 (한 번에 다 꺼지지 않게)
-        periodSeconds: 15
+        value: 10               
+        periodSeconds: 30
