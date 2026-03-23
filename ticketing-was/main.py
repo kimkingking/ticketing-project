@@ -136,3 +136,4 @@ def get_user(user_id: str):
             return {"error": "User not found"}
     except Exception as e:
         return {"status": "error", "message": str(e)}
+#----
