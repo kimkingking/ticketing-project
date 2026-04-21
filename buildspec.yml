@@ -1,0 +1,33 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo "--- AWS ECR 로그인 단계 ---"
+      # AWS CLI를 이용해 ECR에 로그인합니다.
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      # ECR 리포지토리의 전체 주소를 변수로 만듭니다.
+      - REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME
+      # Git 커밋 해시의 앞 7자리를 가져와서 도커 이미지 태그로 사용합니다. (버전 관리용)
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
+
+  build:
+    commands:
+      - echo "--- Docker 이미지 빌드 시작 ---"
+      # 핵심 포인트: 최상단이 아닌 ticketing-was 폴더를 빌드 컨텍스트로 지정합니다.
+      - docker build -t $REPOSITORY_URI:latest -f ticketing-was/Dockerfile ./ticketing-was
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+
+  post_build:
+    commands:
+      - echo "--- 빌드 완료 후 ECR 푸시 ---"
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo "파이프라인 배포 단계를 위한 설정 파일 생성"
+      # ECS 또는 CodeDeploy를 위한 imagedefinitions.json 생성
+      - printf '[{"name":"ticketing-was","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json
