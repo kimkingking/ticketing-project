@@ -9,7 +9,6 @@ config:
     - "bingbot"
   deny:
     - "python-requests"
-    - "curl"
     - "Go-http-client"
     - "axios"
     - "node-fetch"

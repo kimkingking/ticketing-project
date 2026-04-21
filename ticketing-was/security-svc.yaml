@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: security-svc
+spec:
+  selector:
+    # 중요: 현재 님의 main.py가 돌아가고 있는 파드(Pod)의 라벨을 적어야 합니다.
+    # 보통 'app: ticket-backend' 같은 형태입니다. (kubectl get pod --show-labels로 확인)
+    app: ticket-backend 
+  ports:
+    - protocol: TCP
+      port: 80          # 서비스가 외부(인그레스)에서 받을 포트
+      targetPort: 8080  # 실제 파이썬 코드가 기다리는 포트

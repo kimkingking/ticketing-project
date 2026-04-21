@@ -1,14 +1,12 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ticketing-combined-ingress
-  namespace: ticketing-system
+  name: internal-http-ingress  
+  namespace: default
   annotations:
     kubernetes.io/ingress.class: nginx
 
-    # ========================================================
-    # 1. SQL 인젝션 & XSS 방어 (WAF - ModSecurity)
-    # ========================================================
+    # [1. WAF 보안 설정]
     nginx.ingress.kubernetes.io/enable-modsecurity: "true"
     nginx.ingress.kubernetes.io/enable-owasp-core-rules: "true"
     nginx.ingress.kubernetes.io/modsecurity-snippet: |
@@ -16,41 +14,30 @@ metadata:
       SecAuditLog /dev/stdout
       SecAuditLogType Serial
 
-    # ========================================================
-    # 2. DDoS 및 과도한 요청 방어 (Rate Limit)
-    # ========================================================
-    # 초당 요청 수 (RPS) - 팀 프로젝트 테스트를 위해 20으로 상향 조정했습니다.
-    nginx.ingress.kubernetes.io/limit-rps: "20"
-    # 동일 IP에서 동시 연결 가능한 수
-    nginx.ingress.kubernetes.io/limit-connections: "10"
-    # 일시적인 트래픽 폭주 허용치
-    nginx.ingress.kubernetes.io/limit-burst-multiplier: "3"
+      # 💡 [핵심 추가] URL이나 파라미터에 스크립트(<script>)나 SQL 공격(1=1) 패턴이 보이면
+      # OWASP 벌점 확인 전에 가장 먼저(phase:1) 403 에러로 즉시 차단하는 강력한 커스텀 룰!
+      SecRule REQUEST_URI|ARGS "@rx (?i)(<script|1=1|or.*=.*|union.*select)" \
+        "id:100001,phase:1,deny,status:403,log,msg:'Strict WAF Block: XSS or SQLi Detected'"
 
-    # ========================================================
-    # 3. 브라우저 보안 헤더 (Browser Security)
-    # ========================================================
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      # 클릭재킹 방지: 우리 사이트를 타 사이트 프레임에 넣지 못하게 함
-      add_header X-Frame-Options "SAMEORIGIN" always;
-      
-      # MIME 스니핑 방지: 파일 형식 변조 공격 차단
-      add_header X-Content-Type-Options "nosniff" always;
-      
-      # CSP: 허용된 자원만 실행 (XSS 2차 방어선)
-      # 외부 API나 폰트를 쓴다면 'self' 뒤에 해당 도메인을 추가하세요.
-      add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';" always;
-      
-      # Referrer 보안: 민감한 주소 정보 유출 방지
-      add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    # [2. DDoS 방어 설정 (현재 테스트를 위해 주석 처리 추천)]
+    # nginx.ingress.kubernetes.io/limit-rps: "5"           
+    # nginx.ingress.kubernetes.io/limit-connections: "3"    
+
+    # [3. 기존 설정들]
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
 
 spec:
+  ingressClassName: nginx
   rules:
-  - http:
+  - http: 
       paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service: { name: ticket-backend-svc, port: { number: 8000 } }
       - path: /
         pathType: Prefix
         backend:
-          service:
-            name: web-service
-            port:
-              number: 80
+          service: { name: ticket-frontend-svc, port: { number: 80 } }

@@ -1,0 +1,28 @@
+# kong-master-ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kong-master-ingress
+  namespace: default
+  annotations:
+    # 봇 차단과 속도 제한(Rate Limit)을 콤보로 걸어버립니다! 👊
+    konghq.com/plugins: ticketing-bot-detection, ratelimit 
+spec:
+  ingressClassName: kong
+  rules:
+  - http:
+      paths:
+      - path: /kopis-api
+        pathType: Prefix
+        backend:
+          service:
+            name: ticket-backend-svc
+            port:
+              number: 8000
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ticket-frontend-svc
+            port:
+              number: 80

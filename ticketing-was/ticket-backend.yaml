@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ticket-backend-deploy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ticket-backend
+  template:
+    metadata:
+      labels:
+        app: ticket-backend
+    spec:
+      containers:
+      - name: python-backend
+        # 💡 새로 만든 1.06 버전 명시 (경로 문제가 해결된 버전)
+        image: kingking4105/ticketing-was:latest
+        imagePullPolicy: Always
+        env:
+        - name: DB_HOST
+          value: "mysql" # DB 파드와 통신하기 위한 호스트명
+        - name: TURNSTILE_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: captcha-secret
+              key: turnstile-key
+        ports:
+        - containerPort: 8000 # 파이썬 서버 포트
+        resources:
+          requests:
+            cpu: "100m"      # HPA가 계산할 때 쓰는 기준점! (이게 범인이었음)
+            memory: "128Mi"
+          limits:
+            cpu: "500m"      # 최대 이만큼까지만 쓰게 제한
+            memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ticket-backend-svc
+spec:
+  type: ClusterIP # 클러스터 내부에서만 안전하게 통신
+  selector:
+    app: ticket-backend
+  ports:
+  - port: 8000
+    targetPort: 8000
