@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pulseticket-kong-logic
+  namespace: default
+  annotations:
+    # 보혜님의 강력한 봇 차단 플러그인 장착! 🤖
+    konghq.com/plugins: ticketing-bot-detection, ticketing-rate-limit
+spec:
+  ingressClassName: kong
+  rules:
+  - http:
+      paths:
+      # 1. API 요청은 원래대로 API 서버로! 🎯
+      - path: /kopis-api
+        pathType: Prefix
+        backend:
+          service:
+            name: kopis-proxy-svc
+            port:
+              number: 443
+      # 2. 메인 화면(/) 요청은 웹 프론트엔드로! 🎨
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ticket-frontend-svc # <-- 찐 웹사이트 서비스 이름!
+            port:
+              number: 80

@@ -1,0 +1,54 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+body {
+    font-family: 'Pretendard', sans-serif;
+    background-color: #fcfcfd;
+    color: #333333;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+/* 로더 애니메이션 */
+.pastel-loader {
+    width: 50px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 8px solid #f3e8ff;
+    border-right-color: #c084fc; 
+    animation: l2 1s infinite linear;
+}
+@keyframes l2 { to { transform: rotate(1turn); } }
+
+/* 상세 정보 레이블/값 */
+.info-label {
+    width: 80px;
+    flex-shrink: 0;
+    color: #9ca3af;
+    font-weight: 700;
+    font-size: 0.875rem;
+}
+
+.info-value {
+    color: #374151;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+/* 상세 이미지 */
+.intro-images img {
+    max-width: 100%;
+    border-radius: 16px;
+    margin: 0 auto 20px auto;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+/* 프로그래스 바 */
+#progressBar {
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 보안 텍스트 드래그 방지 */
+.no-select {
+    user-select: none;
+    -webkit-user-select: none;
+}

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>좌석 선택 - 프랙티켓</title>
+    <link rel="stylesheet" href="./css/seat.css">
+</head>
+<body>
+    <div class="seat-main-container">
+        <div class="seat-selection-area">
+            <div class="view-header">
+                현재 보고 계신 구역은 <span class="highlight">Floor 층 & 10 구역</span> 입니다.
+            </div>
+            <div class="stage-label">무대방향 (STAGE)</div>
+            
+            <div id="seatGrid" class="seat-grid"></div>
+        </div>
+
+        <div class="seat-sidebar">
+            <div class="mini-map">
+                <img src="stadium_map.png" alt="전체 좌석도" class="map-img"> </div>
+            
+            <div class="seat-status-info">
+                <div class="grade-item"><span class="box vip"></span> &석 220,000원</div>
+                <div class="grade-item"><span class="box a-grade"></span> A석 198,000원</div>
+                <div class="grade-item"><span class="box s-grade"></span> S석 187,000원</div>
+            </div>
+
+            <div class="selected-summary">
+                <h4>선택하신 좌석</h4>
+                <div id="selectedSeatList" class="selected-list">좌석을 선택해 주세요.</div>
+            </div>
+
+            <button class="complete-btn" onclick="finishSelection()">좌석 선택 완료</button>
+            <button class="refresh-btn" onclick="location.reload()">새로고침</button>
+        </div>
+    </div>
+
+    <script src="./js/seat.js"></script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+
+/* 기본 초기화 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Malgun Gothic", dotum, sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #fff;
+}
+
+h2 {
+    text-align: center;
+}
+
+
+.login-container {
+    width: 460px;
+    padding: 20px;
+}
+
+/* 입력창 그룹 */
+.input-group {
+    margin-bottom: 10px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 15px 0;
+    border: none;
+    border-bottom: 1px solid #ebebeb; /* 아래쪽 테두리만 설정 */
+    outline: none;
+    font-size: 16px;
+    color: #333;
+}
+
+/* placeholder 색상 변경 */
+.input-group input::placeholder {
+    color: #ccc;
+}
+
+/* 로그인 상태 유지 */
+.keep-login {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+    font-size: 14px;
+    color: #333;
+}
+
+.keep-login input {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+/* 로그인 버튼 */
+.login-btn {
+    width: 100%;
+    padding: 15px 0;
+    background-color: #03c75a; /* 이미지의 선명한 녹색 */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 25px;
+}
+
+.login-btn:hover {
+    background-color: #02b350; /* 마우스 올렸을 때 약간 어둡게 */
+}
+
+/* 하단 링크 (아이디 찾기 등) */
+.footer-links {
+    text-align: center;
+    font-size: 14px;
+    color: #8e8e8e;
+}
+
+.footer-links a {
+    text-decoration: none;
+    color: #555;
+    margin: 0 10px;
+}
+
+.footer-links span {
+    color: #ddd;
+}

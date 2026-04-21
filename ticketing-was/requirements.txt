@@ -1,9 +1,13 @@
 fastapi
 uvicorn
-request
+requests
 sqlalchemy
 pymysql
-cryptography
 redis
-pyjwt
+aioredis
+requests
+httpx
+pydantic
 python-multipart
+cryptography
+bcrypt

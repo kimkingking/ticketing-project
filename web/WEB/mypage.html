@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PULSE 티켓 - 예매내역</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        body { font-family: 'Pretendard', sans-serif; }
+        .logo-text { font-family: 'Arial Black', sans-serif; letter-spacing: -1px; }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pulse: { 50: '#f3e8ff', 100: '#e9d5ff', 500: '#a855f7', 600: '#9333ea', 700: '#7e22ce' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen">
+
+     <header class="w-full bg-white border-b border-gray-100 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-6">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="location.href='index.html'">
+                <span class="text-3xl text-purple-600"><i data-lucide="ticket" fill="#c084fc" class="w-8 h-8"></i></span>
+                <span class="font-black text-2xl tracking-tight text-gray-900">PULSE <span class="text-purple-500 font-normal">티켓</span></span>
+            </div>
+
+            <div class="hidden md:flex flex-1 max-w-xl relative">
+                <input type="text" placeholder="검색어를 입력하세요 (예: 레베카)" class="w-full bg-gray-100 border-none rounded-full py-3 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 transition-all">
+                <i data-lucide="search" class="absolute left-4 top-3 text-gray-400 w-5 h-5"></i>
+            </div>
+
+            <div id="auth-menu" class="flex items-center gap-4"></div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-10 flex flex-col md:flex-row gap-10">
+        
+        <aside class="w-full md:w-56 shrink-0">
+            <h2 class="text-2xl font-bold mb-6 text-gray-900">마이페이지</h2>
+            <nav class="flex flex-col gap-2">
+                <a href="#" class="px-4 py-3 rounded-xl bg-pulse-50 text-pulse-700 font-bold flex justify-between items-center transition-colors">
+                    예매 확인/취소
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                </a>
+            </nav>
+        </aside>
+
+        <section class="flex-1">
+            <div class="flex items-end justify-between mb-6 pb-4 border-b border-gray-200">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-1">예매 확인/취소</h3>
+                    <p class="text-sm text-gray-500">최근 예매하신 내역입니다.</p>
+                </div>
+                <div class="text-sm text-gray-500">
+                    총 <span id="total-count" class="font-bold text-pulse-600">0</span>건
+                </div>
+            </div>
+
+            <div class="bg-orange-50/80 border border-orange-100 rounded-xl p-5 mb-8 flex gap-3">
+                <i data-lucide="info" class="w-5 h-5 text-orange-500 mt-0.5 shrink-0"></i>
+                <div class="text-sm text-orange-800">
+                    <p class="font-bold mb-1">예매 취소 안내</p>
+                    <ul class="list-disc ml-5 space-y-1 text-orange-700/80">
+                        <li>관람일 당일에는 온라인 취소가 불가하며, 기획사 문의를 통해서만 가능할 수 있습니다.</li>
+                        <li>취소 기한이 지난 티켓은 환불이 불가합니다.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="reservation-list" class="space-y-5">
+            </div>
+
+        </section>
+    </main>
+
+    <script>
+        // 유틸리티: 숫자 콤마
+        const formatNumber = (num) => new Intl.NumberFormat('ko-KR').format(num);
+
+        // 유틸리티: D-Day 뱃지 생성 
+        // 💡 실제 서비스에서는 new Date()를 써야 하지만, 테스트 데이터(2026-03) 기준에 맞추기 위해 TODAY를 하드코딩
+        const TODAY = new Date('2026-03-19T00:00:00');
+        
+        const getStatusBadge = (selectDateStr) => {
+            if (!selectDateStr) return '';
+            const perfDate = new Date(selectDateStr + 'T00:00:00');
+            const diffTime = perfDate - TODAY;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 0) return `<span class="px-2.5 py-1 bg-pulse-100 text-pulse-700 text-xs font-extrabold rounded-md shadow-sm">D-Day (오늘 관람)</span>`;
+            if (diffDays > 0) return `<span class="px-2.5 py-1 bg-green-50 text-green-600 border border-green-200 text-xs font-bold rounded-md">관람 예정 (D-${diffDays})</span>`;
+            return `<span class="px-2.5 py-1 bg-gray-100 text-gray-500 text-xs font-bold rounded-md">관람 완료</span>`;
+        };
+
+        // 로그아웃 처리 함수
+        function handleLogout() {
+            if(confirm('로그아웃 하시겠습니까?')) {
+                sessionStorage.clear(); // 전체 클리어로 변경
+                alert('로그아웃 되었습니다.');
+                window.location.href = 'index.html'; 
+            }
+        }
+
+        // 헤더 UI 동적 업데이트
+        function updateHeaderUI() {
+            const authMenu = document.getElementById('auth-menu');
+            const userId = sessionStorage.getItem('u_id');
+            const userName = sessionStorage.getItem('ename') || userId;
+
+            if (userId) {
+                authMenu.innerHTML = `
+                    <div class="flex items-center gap-2 text-sm text-gray-700 font-medium">
+                        <div class="w-8 h-8 rounded-full bg-pulse-100 text-pulse-600 flex items-center justify-center font-bold">
+                            ${userName.charAt(0).toUpperCase()}
+                        </div>
+                        <span class="font-bold">${userName}</span>님
+                    </div>
+                    <div class="w-px h-4 bg-gray-200 hidden md:block"></div>
+                    <a href="mypage.html" class="hidden md:flex text-sm font-bold text-gray-700 hover:text-pulse-600 transition-colors items-center gap-1">
+                        <i data-lucide="user" class="w-4 h-4"></i> 마이페이지
+                    </a>
+                    <button onclick="handleLogout()" class="text-sm font-bold text-gray-500 hover:text-red-500 transition-colors flex items-center gap-1 ml-2">
+                        <i data-lucide="log-out" class="w-4 h-4"></i> 로그아웃
+                    </button>
+                `;
+            } else {
+                authMenu.innerHTML = `
+                    <a href="login.html" class="text-sm font-bold text-gray-700 hover:text-pulse-600 transition-colors">로그인</a>
+                    <a href="signup.html" class="text-sm font-bold px-4 py-2 bg-pulse-600 text-white rounded-full hover:bg-pulse-700 transition-colors shadow-sm">회원가입</a>
+                `;
+            }
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        // 예매 내역 렌더링
+        const renderReservations = (data) => {
+            const container = document.getElementById('reservation-list');
+            
+            if (!Array.isArray(data)) {
+                console.error("데이터가 배열 형식이 아닙니다:", data);
+                data = []; 
+            }
+
+            document.getElementById('total-count').innerText = data.length;
+
+            if (data.length === 0) {
+                container.innerHTML = `
+                    <div class="py-24 text-center bg-white border border-dashed border-gray-300 rounded-2xl">
+                        <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="ticket" class="w-8 h-8 text-gray-300"></i>
+                        </div>
+                        <p class="text-gray-500 font-medium text-lg">예매된 내역이 없습니다.</p>
+                        <p class="text-gray-400 text-sm mt-1">지금 새로운 공연을 예매해 보세요!</p>
+                    </div>`;
+                lucide.createIcons();
+                return;
+            }
+
+            // 최신 예매 내역이 위로 오도록 역순 정렬
+            const sortedData = data.sort((a, b) => {
+                if (!a.res_id || !b.res_id) return 0;
+                return b.res_id - a.res_id;
+            });
+
+            const htmlContent = sortedData.map(res => {
+                const fallbackPoster = `data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='400' viewBox='0 0 300 400'%3E%3Crect width='300' height='400' fill='%23f3e8ff'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-weight='bold' font-size='24' fill='%239333ea' dominant-baseline='middle' text-anchor='middle'%3EPULSE TICKET%3C/text%3E%3C/svg%3E`;
+                const posterImg = res.poster || fallbackPoster;
+                
+                // 시간 포맷 정리 (14:00:00 -> 14:00)
+                const displayTime = res.select_time ? res.select_time.substring(0, 5) : '';
+
+                return `
+                <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg hover:border-pulse-300 transition-all duration-300 group">
+                    <div class="p-5 flex flex-col md:flex-row gap-6 items-start md:items-center">
+                        
+                        <div class="w-24 md:w-32 aspect-[3/4] shrink-0 rounded-xl overflow-hidden shadow-md border border-gray-200/60 relative bg-gray-100">
+                            <img src="${posterImg}" alt="포스터" onerror="this.onerror=null; this.src='${fallbackPoster}';" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </div>
+
+                        <div class="flex-1 w-full">
+                            <div class="flex justify-between items-center mb-2">
+                                ${getStatusBadge(res.select_date)}
+                                <span class="text-xs text-gray-400 font-mono tracking-wider bg-gray-50 px-2 py-1 rounded">예매번호 ${res.res_id || '-'}</span>
+                            </div>
+                            
+                            <h4 class="text-xl font-extrabold mb-4 text-gray-900 leading-snug group-hover:text-pulse-600 transition-colors">
+                                ${res.perf_title || '공연명 없음'}
+                            </h4>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2.5 gap-x-6">
+                                <div class="flex items-center gap-2.5 text-sm text-gray-600">
+                                    <div class="w-6 h-6 rounded-full bg-pulse-50 flex items-center justify-center shrink-0"><i data-lucide="calendar" class="w-3.5 h-3.5 text-pulse-500"></i></div>
+                                    <span class="font-medium">${res.select_date || '날짜미정'} <span class="text-gray-300 mx-1">|</span> ${displayTime}</span>
+                                </div>
+                                <div class="flex items-center gap-2.5 text-sm text-gray-600">
+                                    <div class="w-6 h-6 rounded-full bg-pulse-50 flex items-center justify-center shrink-0"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-pulse-500"></i></div>
+                                    <span class="truncate font-medium" title="${res.place}">${(res.place || '장소미정').split('(')[0].trim()}</span>
+                                </div>
+                                <div class="flex items-center gap-2.5 text-sm text-gray-600">
+                                    <div class="w-6 h-6 rounded-full bg-pulse-50 flex items-center justify-center shrink-0"><i data-lucide="armchair" class="w-3.5 h-3.5 text-pulse-500"></i></div>
+                                    <span class="font-bold text-gray-800">좌석 ${res.seat_num || '-'}</span>
+                                </div>
+                                <div class="flex items-center gap-2.5 text-sm text-gray-600">
+                                    <div class="w-6 h-6 rounded-full bg-pulse-50 flex items-center justify-center shrink-0"><i data-lucide="credit-card" class="w-3.5 h-3.5 text-pulse-500"></i></div>
+                                    <span class="font-bold text-pulse-600">${res.price ? formatNumber(res.price) : '0'}원</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="w-full md:w-32 flex flex-row md:flex-col gap-2.5 shrink-0 border-t md:border-t-0 md:border-l border-gray-100 pt-5 md:pt-0 md:pl-6 mt-4 md:mt-0 h-full justify-center">
+                            <button class="flex-1 py-3 md:py-2.5 text-sm font-bold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-colors">
+                                예매 상세
+                            </button>
+                            <button class="flex-1 py-3 md:py-2.5 text-sm font-bold text-white bg-pulse-600 border border-transparent rounded-xl hover:bg-pulse-700 transition-colors shadow-sm shadow-pulse-200">
+                                티켓 보기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            container.innerHTML = htmlContent;
+            lucide.createIcons();
+        };
+
+        const fetchReservations = async (userId) => {
+            try {
+                // 💡 [핵심 수정] 하드코딩된 IP를 지우고 상대경로 사용!
+                const response = await fetch(`/api/reservations/${userId}`);
+                
+                if (!response.ok) throw new Error(`서버 응답 오류 (상태코드: ${response.status})`);
+                
+                const result = await response.json();
+                console.log("받아온 예매 내역 데이터:", result); // 디버깅용 콘솔
+                
+                // 백엔드가 어떻게 주느냐에 따라 배열을 찾아서 넘겨줌
+                const reservationData = result.data || result.reservations || result || [];
+                renderReservations(reservationData); 
+                
+            } catch (error) {
+                console.error("데이터 패치 실패:", error);
+                document.getElementById('reservation-list').innerHTML = `
+                    <div class="py-12 text-center text-red-500 font-bold flex flex-col items-center bg-red-50/50 rounded-2xl border border-red-100">
+                        <i data-lucide="wifi-off" class="w-12 h-12 mb-3 text-red-400"></i>
+                        <span class="text-lg">예매 내역을 불러오는데 실패했습니다.</span>
+                        <span class="text-sm font-normal mt-1 text-red-400">서버 연결 상태를 확인해주세요.</span>
+                    </div>`;
+                lucide.createIcons();
+            }
+        };
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', () => {
+            updateHeaderUI();
+            
+            let userId = sessionStorage.getItem('u_id');
+
+            // 로그인 정보가 없을 경우 처리
+            if (!userId) {
+                document.getElementById('reservation-list').innerHTML = `
+                    <div class="py-24 text-center bg-white border border-dashed border-red-200 rounded-2xl">
+                        <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="shield-alert" class="w-8 h-8 text-red-400"></i>
+                        </div>
+                        <p class="text-red-500 font-bold mb-2 text-lg">로그인 정보가 없습니다.</p>
+                        <p class="text-gray-500 text-sm mb-6">로그인 후 안전하게 예매 내역을 확인하세요.</p>
+                        <button onclick="location.href='login.html'" class="px-6 py-2.5 bg-pulse-600 text-white font-bold rounded-xl hover:bg-pulse-700 transition-colors shadow-sm">
+                            로그인 하러가기
+                        </button>
+                    </div>`;
+                lucide.createIcons();
+                return; 
+            }
+
+            // 정상 로그인 상태라면 데이터 요청
+            fetchReservations(userId);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>직원 로그인</title>
+    <link rel="stylesheet" href="./css/login.css">
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="logo">
+        <div class="circle-outer"><div class="circle-inner"></div></div>
+      </div>
+      <h2>로그인</h2>
+
+      <form id="loginForm" onsubmit="return false;">
+        <div class="input-group">
+          <input type="text" id="employeeId" placeholder="아이디 입력" required />
+        </div>
+        <div class="input-group">
+          <input type="password" id="password" placeholder="비밀번호" required />
+        </div>
+        
+        <div id="pw-message" style="font-size: 13px; margin-bottom: 15px; min-height: 18px; font-weight: bold;"></div>
+
+        <button type="button" id="loginBtn" class="login-btn">로그인</button>
+      </form>
+
+      <div class="footer-links">
+        <a href="./signin.html">회원가입</a>
+      </div>
+    </div>
+
+    <script src="./js/login.js"></script>
+  </body>
+</html>

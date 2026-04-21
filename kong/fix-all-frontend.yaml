@@ -1,0 +1,48 @@
+# 1. 첫 번째 대문 수정 📝
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: internal-http-ingress
+  namespace: default
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: pulseticket.ke
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: kong-bridge-svc # 콩으로 연결! 🎯
+            port:
+              number: 80
+  - host: www.pulseticket.ke
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: kong-bridge-svc # 콩으로 연결! 🎯
+            port:
+              number: 80
+---
+# 2. 두 번째 대문 수정 📝
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ip-access-ingress
+  namespace: default
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: kong-bridge-svc # 여기도 콩으로 연결! 🎯
+            port:
+              number: 80

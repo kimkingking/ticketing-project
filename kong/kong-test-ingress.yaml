@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kong-test-ingress
+  namespace: default
+  annotations:
+    # [핵심] 콩(Kong)에게 이 문지기들을 배치하라고 명령합니다!
+    konghq.com/plugins: ticketing-bot-detection, ticketing-rate-limit
+spec:
+  # [중요] 이 대문의 관리자는 NGINX가 아니라 'kong'임을 명시! 🥂
+  ingressClassName: kong
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ticket-backend-svc
+            port:
+              number: 8000

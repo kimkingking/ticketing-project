@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ticketing-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ticketing-worker
+  template:
+    metadata:
+      labels:
+        app: ticketing-worker
+    spec:
+      containers:
+      - name: worker
+        image: redis:latest
+        command: ["/bin/sh"]
+        args:
+        - "-c"
+        - "while true; do redis-cli -h redis-service ZPOPMIN ticket_queue 1; echo 'User Processed'; sleep 0.5; done" # 0.5초마다 한 명씩 입장!

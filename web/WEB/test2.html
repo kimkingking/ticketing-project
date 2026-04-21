@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>간단한 웹페이지 예시</title>
+    
+    <style>
+        /* 기본 바디 스타일: 중앙 정렬 */
+        body {
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; /* 한국어 폰트 설정 */
+            background-color: #f0f2f5; /* 연한 회색 배경 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* 화면 꽉 차게 */
+            margin: 0;
+        }
+
+        /* 중앙 컨테이너 스타일 */
+        .container {
+            text-align: center;
+            background-color: #ffffff; /* 흰색 배경 */
+            padding: 50px;
+            border-radius: 15px; /* 모서리 둥글게 */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+        }
+
+        /* 제목 스타일 */
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        /* 설명 문구 스타일 */
+        p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        /* 💡 버튼 스타일 */
+        button {
+            background-color: #3498db; /* 파란색 배경 */
+            color: white; /* 흰색 글씨 */
+            border: none; /* 테두리 제거 */
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer; /* 마우스 오버 시 손가락 모양 */
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s ease; /* 부드러운 색상 변경 효과 */
+        }
+
+        /* 버튼 마우스 오버 시 효과 */
+        button:hover {
+            background-color: #2980b9; /* 진한 파란색으로 변경 */
+        }
+
+        /* 결과 메시지 영역 스타일 (처음엔 숨김) */
+        #result {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #e8f8f5; /* 아주 연한 초록색 배경 */
+            color: #27ae60; /* 초록색 글씨 */
+            font-weight: bold;
+            display: none; /* 처음에 안 보이게 설정 */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>환영합니다!</h1>
+        <p>아래 버튼을 클릭하여 자바스크립트 동작을 확인해보세요.</p>
+        
+        <button id="myButton">여기를 클릭하세요</button>
+        
+        <div id="result">🎉 축하합니다! 버튼이 정상적으로 작동합니다.</div>
+    </div>
+
+    <script>
+        // 1. HTML 요소(버튼, 결과 영역)를 자바스크립트 변수로 가져옵니다.
+        const button = document.getElementById('myButton');
+        const resultDiv = document.getElementById('result');
+
+        // 2. 버튼에 '클릭' 이벤트 리스너를 추가합니다.
+        button.addEventListener('click', function() {
+            // 버튼이 클릭되면 실행될 코드
+
+            // 3. 결과 영역의 style.display를 'block'으로 바꿔 화면에 보이게 합니다.
+            resultDiv.style.display = 'block';
+            
+            // 4. (선택사항) 클릭 후 버튼의 텍스트를 바꾸고 비활성화합니다.
+            this.textContent = '클릭됨!';
+            this.style.backgroundColor = '#95a5a6'; // 회색으로 변경
+            this.disabled = true; // 버튼 비활성화
+        });
+    </script>
+
+</body>
+</html>
