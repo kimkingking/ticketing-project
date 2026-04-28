@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pulseticket-api-ingress
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP" # Kong까지는 HTTP로 전송
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+spec:
+  ingressClassName: nginx
+  # IP로 접속할 땐 도메인 인증서가 필요 없으니 잠시 꺼둡니다! ✅
+  # tls:
+  # - hosts:
+  #   - pulseticket.ke
+  #   - www.pulseticket.ke
+  #   secretName: pulseticket-tls-secret 
+  rules:
+  - http: # <--- 기존의 '- host: www.pulseticket.ke' 명찰 검사를 아예 날려버렸습니다! 🎯
+      paths:
+      - path: /(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: kong-bridge-svc # 이제 콩(Kong)으로 갑니다! 🎯
+            port:
+              number: 80

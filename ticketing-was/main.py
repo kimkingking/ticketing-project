@@ -1,61 +1,122 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from sqlalchemy import create_engine, text
-import redis
+from sqlalchemy import text
 import json
 import time
 
+# [설정] DB와 Redis 연결은 database.py에서 통합 관리합니다.
+from database import engine, rd
+
+# [보안] 이중 방어용 커스텀 보안 미들웨어
+from security import SecurityFilterMiddleware
+
+# [라우터]
+import login  
+import signin
+import reservation
+
 app = FastAPI()
 
-# 1. DB 연결 설정 (한글 지원 charset 포함)
-DB_URL = "mysql+pymysql://was_user:1234@mysql-service:3306/ticket?charset=utf8mb4"
-engine = create_engine(DB_URL, echo=True)
+# ==========================================
+# [미들웨어 등록] 순서가 매우 중요합니다!
+# ==========================================
 
-# 2. Redis 연결 설정
-rd = redis.Redis(host='redis-service', port=6379, db=0, decode_responses=True)
+# 1️⃣ 안쪽 껍질: 보안 WAF 미들웨어 (실제 비즈니스 로직 직전에 실행)
+app.add_middleware(SecurityFilterMiddleware)
 
-# 3. 데이터 모델 정의
-class ReservationRequest(BaseModel):
-    user_id: str
-    seat_id: int
-    perf_id: str
-    perf_title: str
-    select_date: str
-    select_time: str
-    place: str
-    price: int
+# 2️⃣ 바깥쪽 껍질: CORS 미들웨어 (FastAPI는 나중에 추가한 게 먼저 실행됨)
+# 이렇게 해야 브라우저의 OPTIONS 요청을 CORS가 먼저 안전하게 처리해줍니다.
+origins = [
+    "http://www.pulseticket.ke:30007",
+    "https://www.pulseticket.ke",  
+    "https://pulseticket.ke",      
+    "http://www.pulseticket.ke",
+    "http://10.4.0.203",           
+    "https://10.4.0.203",
+    "http://10.4.0.201", 
+    "http://10.4.0.150:30007",
+    "http://10.4.0.150"
+]
 
-# [기본] 루트 페이지
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,       
+    allow_credentials=True,     
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ==========================================
+# [라우터 등록]
+# ==========================================
+app.include_router(login.router)
+app.include_router(signin.router)
+app.include_router(reservation.router, prefix="/api/reservations")
+
+# ==========================================
+# [API 엔드포인트]
+# ==========================================
+
 @app.get("/")
-def read_root():
-    return {"message": "Welcome to the Ticketing System v22 (Full Features + Pessimistic Lock)!"}
+async def root():
+    return {"message": "Welcome to the Integrated Ticketing System! 🚀 (서버 정상 작동 중)"}
 
-# [기능 1] DB 연결 테스트용
 @app.get("/db-test")
-def test_db():
+def db_test():
     try:
         with engine.connect() as conn:
-            conn.execute(text("SELECT 1"))
-            return {"status": "success", "db_result": "Connected to MariaDB!"}
+            result = conn.execute(text("SELECT 1"))
+            return {"status": "success", "db_result": "Connected to MySQL/MariaDB!"}
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-# [기능 2] Redis 연결 테스트용
-@app.get("/redis-test")
-def test_redis():
+# ✨ 대기열 관리자 API
+@app.post("/next")
+def allow_next_users(count: int = 10): 
     try:
-        rd.set("test_key", "Redis is Alive! 🚀")
-        value = rd.get("test_key")
-        return {"status": "success", "redis_result": value}
+        top_users = rd.zrange("ticket_queue", 0, count - 1)
+        
+        if not top_users:
+            return {"status": "success", "message": "현재 대기열이 텅 비어있습니다."}
+        
+        rd.sadd("allowed_users", *top_users)
+        rd.zrem("ticket_queue", *top_users)
+        
+        return {
+            "status": "success",
+            "message": f"{len(top_users)}명의 유저가 입장 허가를 받았습니다!",
+            "allowed_users": top_users
+        }
     except Exception as e:
-        return {"status": "error", "message": str(e)}
+        return {"status": "error", "message": f"대기열 이동 중 오류 발생: {str(e)}"}
 
-# [기능 3] 예약 가능한 좌석 조회
+# ✨ 예약 내역 조회 API
+@app.get("/api/reservations/{user_id}")
+def get_user_reservations(user_id: str):
+    try:
+        with engine.connect() as conn:
+            query = text("""
+                SELECT
+                    res_id, user_id, seat_id, seat_num, perf_id, perf_title,
+                    DATE_FORMAT(select_date, '%Y-%m-%d') as select_date,
+                    TIME_FORMAT(select_time, '%H:%i:%s') as select_time,
+                    place, price,
+                    DATE_FORMAT(res_date, '%Y-%m-%d %H:%i:%s') as res_date
+                FROM reservation
+                WHERE user_id = :uid
+                ORDER BY res_date DESC
+            """)
+            result = conn.execute(query, {"uid": user_id}).mappings().all()
+            return [dict(row) for row in result]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"DB 조회 중 오류 발생: {str(e)}")
+
+# ✨ 빈 좌석 조회 API
 @app.get("/seats")
 def get_seats():
     try:
         with engine.connect() as conn:
-            # 상태가 AVAILABLE인 좌석만 조회
             query = text("SELECT seat_id, seat_num FROM seat WHERE status = 'AVAILABLE'")
             result = conn.execute(query)
             seats = [{"seat_id": row[0], "seat_num": row[1]} for row in result]
@@ -63,58 +124,7 @@ def get_seats():
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-# [기능 4] 티켓 예약하기 (즉시 확정 버전)
-@app.post("/reserve")
-def reserve_ticket(req: ReservationRequest):
-    try:
-        # 1. Redis 대기열은 유지
-        now = time.time()
-        rd.zadd("ticket_queue", {req.user_id: now})
-        rank = rd.zrank("ticket_queue", req.user_id) + 1
-
-        with engine.connect() as conn:
-            with conn.begin():
-                # 2. 비관적 락: 해당 좌석을 꽉 잡습니다.
-                select_query = text("SELECT status FROM seat WHERE seat_id = :id FOR UPDATE")
-                seat = conn.execute(select_query, {"id": req.seat_id}).fetchone()
-
-                # 3. 상태 체크
-                if not seat or seat[0] != 'AVAILABLE':
-                    return {
-                        "status": "fail",
-                        "message": "이미 예약이 완료된 좌석입니다.",
-                        "waiting_number": rank
-                    }
-
-                # 4. 바로 OCCUPIED(점유됨)로 변경
-                update_query = text("UPDATE seat SET status = 'OCCUPIED' WHERE seat_id = :id")
-                conn.execute(update_query, {"id": req.seat_id})
-
-                # 5. 예약 장부 작성
-                insert_query = text("""
-                    INSERT INTO reservation (user_id, seat_id, perf_id, perf_title, select_date, select_time, place, price)
-                    VALUES (:user_id, :seat_id, :perf_id, :perf_title, :select_date, :select_time, :place, :price)
-                """)
-                conn.execute(insert_query, {
-                    "user_id": req.user_id, "seat_id": req.seat_id,
-                    "perf_id": req.perf_id, "perf_title": req.perf_title,
-                    "select_date": req.select_date, "select_time": req.select_time,
-                    "place": req.place, "price": req.price
-                })
-
-        # 모든 과정이 성공하면 리턴
-        return {
-            "status": "success",
-            "message": f"{req.seat_id}번 좌석 예약이 완료되었습니다!",
-            "waiting_number": rank
-        }
-
-    except Exception as e:
-        # db.rollback()은 conn.begin()이 자동으로 해주므로 삭제했습니다!
-        print(f"Error during reservation: {e}")
-        return {"status": "error", "message": f"예약 중 오류 발생: {str(e)}"}
-
-# [기능 5] 특정 유저 정보 조회
+# ✨ 단일 유저 조회 API
 @app.get("/users/{user_id}")
 def get_user(user_id: str):
     try:
@@ -126,3 +136,4 @@ def get_user(user_id: str):
             return {"error": "User not found"}
     except Exception as e:
         return {"status": "error", "message": str(e)}
+#----

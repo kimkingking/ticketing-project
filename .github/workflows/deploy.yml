@@ -2,11 +2,11 @@ name: Ticketing System CI/CD
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "test-main" ]
 
 jobs:
   build-and-deploy:
-    runs-on: self-hosted  # <--- 방금 만든 'master' 비서를 호출합니다!
+    runs-on: self-hosted
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
@@ -17,22 +17,42 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Build and push Docker image
+    - name: Build and push Backend Image (Bohye's Work)
       run: |
+        # 보혜님의 백엔드만 빌드해서 올립니다.
         docker build -t kingking4105/ticketing-was:latest ./ticketing-was
         docker push kingking4105/ticketing-was:latest
+    
+    - name: Login to Docker Hub (Seonghoon)
+      uses: docker/login-action@v2
+      with:
+        # 방금 깃허브 Secret에 새로 만든 이름으로 설정합니다.
+        username: ${{ secrets.DOCKER_USERNAME_SH }}
+        password: ${{ secrets.DOCKER_PASSWORD_SH }}
 
-    - name: Deploy to K8s
+    - name: Build and push Frontend Image (Seonghoon's Work)
+      run: |
+        # L 부분에 성훈님의 실제 도커 아이디를 적어주세요.
+        docker build -f ./web/Dockerfile.web -t leeseonghoon234/ticket-web:latest ./web
+        docker push leeseonghoon234/ticket-web:latest
+
+
+    - name: Deploy and Refresh K8s
       run: |
         mkdir -p ~/.kube
         echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
 
-        # 핵심 수정: 에러 나는 ns.json 무시하고, 실제 배포 파일만 실행!
-        # 파일 이름을 정확하게 지정해 주는 게 가장 안전합니다.
-        kubectl apply -f ./ticketing-was/ticketing-deploy.yaml
+        # 1. 최신 설정 파일 적용 (백엔드/프론트엔드)
+        kubectl apply -f ./ticketing-was/ticket-backend.yaml
+        kubectl apply -f ./web/ticket-frontend.yaml
 
-        # 확실하게 재시작해서 새 이미지 반영
-        kubectl rollout restart deployment/ticketing-was-deploy
+        # 2. 💡 프론트엔드 최신 이미지 강제 반영 (성훈님 작업물 땡겨오기)
+        # imagePullPolicy: Always 덕분에 재시작 시 최신 이미지를 새로 받아옵니다.
+        kubectl rollout restart deployment/ticket-frontend-deploy
+        
+        # 3. 백엔드도 함께 재시작 (보혜님 작업물 반영)
+        kubectl rollout restart deployment/ticket-backend-deploy
 
         # 완료 대기
-        kubectl rollout status deployment/ticketing-was-deploy
+        kubectl rollout status deployment/ticket-frontend-deploy
+        kubectl rollout status deployment/ticket-backend-deploy

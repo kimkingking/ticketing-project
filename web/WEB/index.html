@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PULSE 티켓 | 설레는 문화 나들이</title>
+    
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="stylesheet" href="./css/mainpage.css">
+    <style>
+        /* 깔끔한 페이드인 애니메이션 */
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div id="loader" class="fixed inset-0 z-[200] bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center transition-opacity duration-700">
+        <div class="pastel-loader mb-4"></div>
+        <h1 class="text-purple-600 font-bold text-lg tracking-widest">데이터를 불러오는 중...</h1>
+    </div>
+
+    <header class="w-full bg-white border-b border-gray-100 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-6">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="location.href='index.html'">
+                <span class="text-3xl text-purple-600"><i data-lucide="ticket" fill="#c084fc" class="w-8 h-8"></i></span>
+                <span class="font-black text-2xl tracking-tight text-gray-900">PULSE <span class="text-purple-500 font-normal">티켓</span></span>
+            </div>
+
+            <div class="hidden md:flex flex-1 max-w-xl relative">
+                <input type="text" placeholder="검색어를 입력하세요 (예: 레베카)" class="w-full bg-gray-100 border-none rounded-full py-3 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 transition-all">
+                <i data-lucide="search" class="absolute left-4 top-3 text-gray-400 w-5 h-5"></i>
+            </div>
+
+            <div id="auth-menu" class="flex items-center gap-5"></div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        <section class="flex justify-center gap-8 md:gap-12 mb-12 overflow-x-auto no-scrollbar py-4" id="categoryMenu"></section>
+
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+            <div class="rounded-3xl bg-gradient-to-r from-indigo-100 to-purple-100 p-8 flex items-center justify-between cursor-pointer hover:shadow-lg transition-shadow h-[200px]">
+                <div>
+                    <span class="bg-white text-indigo-600 text-xs font-bold px-2 py-1 rounded-md mb-3 inline-block shadow-sm">티켓 혜택</span>
+                    <h2 class="text-2xl font-black text-gray-800 leading-tight mb-2">설레는 문화 나들이<br>봄맞이 공연·전시 특가</h2>
+                    <p class="text-indigo-600 text-sm font-medium">티켓 2천원 할인 쿠폰까지</p>
+                </div>
+                <div class="text-6xl drop-shadow-md">🌸</div>
+            </div>
+            <div class="rounded-3xl bg-gradient-to-r from-blue-100 to-cyan-100 p-8 flex items-center justify-between cursor-pointer hover:shadow-lg transition-shadow h-[200px]">
+                <div>
+                    <span class="bg-white text-blue-600 text-xs font-bold px-2 py-1 rounded-md mb-3 inline-block shadow-sm">HOT ISSUE</span>
+                    <h2 class="text-2xl font-black text-gray-800 leading-tight mb-2">놀라운 혜택 AWARDS<br>관객 최종 투표 진행중!</h2>
+                    <p class="text-blue-600 text-sm font-medium">투표 참여하고 쿠폰도 받으세요!</p>
+                </div>
+                <div class="text-6xl drop-shadow-md">🏆</div>
+            </div>
+        </section>
+
+        <section class="mb-16">
+            <div class="w-full bg-yellow-50 border border-yellow-100 rounded-xl p-4 flex items-center justify-center gap-4 cursor-pointer hover:bg-yellow-100 transition-colors">
+                <span class="font-bold text-gray-800">공연·전시 <span class="text-purple-600">2천원 할인쿠폰</span> 받으세요!</span>
+                <span class="text-xs text-gray-500">예매 전 꼭 챙기세요!</span>
+                <i data-lucide="ticket-percent" class="w-6 h-6 text-purple-500"></i>
+            </div>
+        </section>
+
+        <section class="mb-20">
+            <h2 class="text-2xl font-black text-gray-900 mb-6">HOT! 인기 티켓</h2>
+            <div class="flex gap-2 mb-8 overflow-x-auto no-scrollbar" id="tabMenu"></div>
+            
+            <div class="relative group/slider">
+                <button id="btn-scroll-left" onclick="scrollBoxOffice('left')" class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-12 h-12 bg-white rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.15)] flex items-center justify-center text-gray-600 hover:text-purple-600 hover:scale-110 transition-all duration-300 border border-gray-100 hidden md:flex opacity-0 group-hover/slider:opacity-100 scroll-btn-disabled">
+                    <i data-lucide="chevron-left" class="w-7 h-7"></i>
+                </button>
+                
+                <div id="boxOfficeList" class="flex gap-6 overflow-x-auto no-scrollbar pb-8 snap-x snap-mandatory scroll-smooth relative z-0"></div>
+                
+                <button id="btn-scroll-right" onclick="scrollBoxOffice('right')" class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-12 h-12 bg-white rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.15)] flex items-center justify-center text-gray-600 hover:text-purple-600 hover:scale-110 transition-all duration-300 border border-gray-100 hidden md:flex opacity-0 group-hover/slider:opacity-100">
+                    <i data-lucide="chevron-right" class="w-7 h-7"></i>
+                </button>
+            </div>
+        </section>
+
+        <section class="mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div>
+                <h2 class="text-2xl font-black text-gray-900" id="listTitle">오픈 예정 및 진행중인 공연</h2>
+                <p class="text-gray-400 text-sm mt-1">원하시는 날짜를 선택하여 공연을 필터링해보세요.</p>
+            </div>
+            <div class="flex items-center gap-3 bg-white p-2 rounded-2xl border border-gray-200 shadow-sm w-full md:w-fit">
+                <div class="flex items-center gap-2 px-3 border-r border-gray-100 flex-1 md:flex-none">
+                    <i data-lucide="calendar" class="w-4 h-4 text-purple-500"></i>
+                    <input type="date" id="startDate" class="text-sm font-bold outline-none bg-transparent focus:text-purple-600">
+                    <span class="text-gray-300">~</span>
+                    <input type="date" id="endDate" class="text-sm font-bold outline-none bg-transparent focus:text-purple-600">
+                </div>
+                <button onclick="fetchAllData()" class="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all active:scale-95 flex items-center justify-center gap-2 shadow-md">
+                    <i data-lucide="search" class="w-4 h-4"></i> 조회
+                </button>
+            </div>
+        </section>
+
+        <section class="mb-20">
+            <div id="performanceList" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-x-4 gap-y-10"></div>
+        </section>
+    </main>
+
+    <div id="modal-container" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onclick="closeModal()"></div>
+        <div id="modal-content" class="relative bg-white rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl z-10 animate-fade-in"></div>
+    </div>
+
+    <script>
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('loader');
+            if(loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 700);
+            }
+        });
+    </script>
+    <script src="./js/mainpage.js"></script>
+</body>
+</html>

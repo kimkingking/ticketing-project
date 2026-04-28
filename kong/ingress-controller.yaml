@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingress-nginx-controller
+  namespace: ingress-nginx
+  annotations:
+    metallb.universe.tf/loadBalancerIPs: "10.4.0.203"  # <-- [수정 필수] 사용할 실제 IP 입력
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 10.4.0.203                           # <-- [수정 필수] 위와 동일한 IP 입력
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
+    - name: https
+      port: 443
+      protocol: TCP
+      targetPort: https
+  selector:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx

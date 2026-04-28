@@ -1,18 +1,32 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: ticketing-was-hpa
+  name: ticket-backend-deploy
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: ticketing-was-deploy  # 대시 없이 바로 이름을 씁니다.
+    name: ticket-backend-deploy
   minReplicas: 2
-  maxReplicas: 10
+  maxReplicas: 20
   metrics:
   - type: Resource
     resource:
       name: cpu
       target:
         type: Utilization
-        averageUtilization: 50
+        averageUtilization: 10
+  # --- 여기서부터 추가된 부분 ---
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 0   # 부하 감지 시 대기 시간 없이 즉시 실행
+      policies:
+      - type: Pods
+        value: 4                    # 한 번에 현재 파드 수의 400%까지 증가 허용
+        periodSeconds: 15             # 15초마다 정책 재계산
+    scaleDown:
+      stabilizationWindowSeconds: 120
+      policies:
+      - type: Percent
+        value: 10               
+        periodSeconds: 30
