@@ -16,15 +16,22 @@ spec:
       - name: ticketing-was
         image: kingking4105/ticketing-was:latest
         imagePullPolicy: Always
-        workingDir: /app/data
+        workingDir: /app
         env:
         - name: DB_HOST
           value: "mysql-service"
         ports:
         - containerPort: 8000
+        env:
+        - name: TURNSTILE_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: captcha-secret
+              key: turnstile-key
         volumeMounts:
         - name: was-storage
-          mountPath: /app/data
+          #mountPath: /app/data
+          mountPath: /app
       volumes:
       - name: was-storage
         persistentVolumeClaim:
